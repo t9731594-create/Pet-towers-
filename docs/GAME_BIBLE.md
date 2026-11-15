@@ -1,5 +1,7 @@
 # CATCH PETS, CLIMB THE TOWER
 # Master build prompt + game bible, v1 (14 Nov 2026). Working title.
+# With Amendment 1 folded in (15 Nov 2026): wild showdowns and Secret
+# pets. Amended passages are marked [A1]. The v1 text is in git history.
 
 This one document is both your instructions and the game bible. It
 replaces any earlier prompt for this game.
@@ -192,6 +194,30 @@ Catching: the Trust Tap
   sheen, x3 income). A Legendary or Radiant raises a pillar of light
   and a server banner and stays 90 s so everyone can ride up and try.
 
+Wild showdowns: play first, then catch [A1]
+- Common, Uncommon and Rare pets: Trust Tap only, as above.
+- Epic, Legendary and Secret pets want to play before they trust
+  you. Walk up and a small ring opens. Your team plays with the pet
+  by itself; you tap rings to cheer, exactly as in a Guardian
+  showdown. Natures count (x1.5).
+- The pet has a Play meter: the floor's Guardian power x 4 (Epic),
+  x 10 (Legendary) or x 150 (Secret). Teams drain it at Team Power
+  per second. Anyone on the floor can step in and add their team.
+- The meter never refills while the pet is there. If it is not
+  empty when the pet leaves, the pet just leaves. Nothing is lost.
+- Meter empty: everyone who took part gets one Trust Tap try, with
+  rings 20% slower because the pet now likes you.
+- Rough feel: a player ready for that floor's Guardian plays an Epic
+  out in about 5 s and a Legendary in about 12 s. A Secret takes
+  three ready players about a minute.
+- No Keepers, no chase, nothing dropped.
+
+Secret pets (the long hunt) [A1]
+- One Secret pet per floor, above Legendary (untested: x20 income,
+  x10 power). It appears when the floor's lantern chimes, about 3
+  times a day at times that are the same on every server, with a
+  glow that builds and a server banner. It stays 3 minutes.
+
 The stack and the camp
 - Caught pets ride in a wobbling stack on your head until you take
   them home. Stack size 3, up to 10 with coins. Full stack: Wick
@@ -342,6 +368,9 @@ By rarity, Common / Uncommon / Rare / Epic / Legendary
   Guardian 1 by 5 min, Guardian 2 by 15-20 min, Guardian 3 on day 2,
   Guardian 4 on day 4, Guardian 5 around day 8. Evolutions at about
   3 minutes, on the first return visit, and on day 4.
+- [A1] Secret pets: income x20, power x10 (untested). Play meters:
+  Guardian power x 4 / 10 / 150 for Epic / Legendary / Secret.
+  tools/econ_sim adds 5 s per Epic try and 12 s per Legendary try.
 - A simulation with a greedy bot hits those targets with these values
   (wins at about 4, 15, 58, 141 and 260 active minutes). The bot
   ignores natures, friend and rested bonuses, treasure and index
@@ -440,7 +469,8 @@ figures. Never realistic.
    x3" under the pillar of light.
 2. The Dawn-or-Dusk evolution reveal.
 3. The pet stack: ten pets wobbling on a tiny avatar.
-4. A whole server riding the lift to one Legendary.
+4. [A1] A whole server playing with one Legendary, then seven catch
+   tries at once.
 5. Seven players' pets around one building-sized Guardian.
 Offer a capture at these moments through the Captures API where
 Roblox allows it for that player (Moments is 13+). Otherwise nothing.
@@ -480,6 +510,8 @@ PART C. BUILD PLAN
   12 wild pets and 7 stacks on screen; client memory under 600 MB;
   low-graphics mode turns off shadows and trims effects.
 - A debug panel for testing exists in Studio only.
+- [A1] Wild showdowns reuse the Showdown service and UI. No new
+  combat system, no moves, no health bars on pets.
 
 ## C2. Milestones (build, test, report, continue)
 M0 Setup. Bible saved, status files, source install, tools/econ_sim
@@ -525,6 +557,8 @@ Targets
 - Session 12 min+ (median 9.8, top 5% 16.6).
 - 20%+ of sessions include a showdown with another player.
 - 40%+ of choices are Share. If far lower, raise the share reward.
+- [A1] Track wild showdowns started, joined by 2+ players, and
+  finished. Target: half of Legendary showdowns have 2+ players.
 
 ## C4. Launch (prepare everything; I approve every spend and post)
 - Account: ID-verified, 2-step verification on, and either Plus or
