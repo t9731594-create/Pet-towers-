@@ -37,7 +37,7 @@ function Rings.play(opts)
 		if self.done then return end
 		local kind = io.UserInputType
 		if kind == Enum.UserInputType.Touch or kind == Enum.UserInputType.MouseButton1 or io.KeyCode == Enum.KeyCode.Space or io.KeyCode == Enum.KeyCode.ButtonA then
-			if processed and kind ~= Enum.UserInputType.Touch then return end
+			if processed then return end -- the thumbstick, jump button and our own buttons are not taps
 			opts.onTap(Ui.now() - opts.start)
 		end
 	end)

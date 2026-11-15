@@ -1,6 +1,6 @@
 -- Client entry point (greybox UI, M1-M3). Phone first: landscape, big targets, icons and numbers.
 local Controllers = script.Parent.Controllers
-local order = { "HUD", "TrustTap", "Showdown", "FX", "WildShowdown", "Secret", "Wick", "Choice", "Welcome", "Emotes", "Week", "IndexBoard", "Settings", "Debug", "Team", "Audio", "Closet", "Mailbox", "Bloom", "Shop" }
+local order = { "HUD", "TrustTap", "Showdown", "FX", "WildShowdown", "Secret", "Wick", "Choice", "Welcome", "Emotes", "Week", "IndexBoard", "Settings", "Debug", "Team", "Audio", "Closet", "Mailbox", "Bloom", "Shop", "Lift" }
 for _, name in ipairs(order) do
 	local module = Controllers:FindFirstChild(name)
 	if module then

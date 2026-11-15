@@ -477,6 +477,7 @@ function tests.e01_every_server_to_client_remote()
 		WeeklyChoice = { {} },
 		Index = { { H.core(world, "Profile") and world.server:require("Services", "SettingsService") and
 			world.server:call(world.server.env.require, world.services.ReplicatedStorage.Shared.Logic.IndexView).build(H.profile(world, ann), 5) } },
+		LiftMenu = { { 3 }, { 5 } },
 		Mail = { { { journeyDay = 2, tomorrow = { minutes = 7, look = "aura_spark" }, egg = { state = "ready", readyAt = now }, codes = true } },
 			{ { journeyDay = 9, tomorrow = { minutes = 10 }, egg = { state = "none" }, codes = false } } },
 		Closet = { { { looks = { "aura_spark", "trail_star", "weekly_3" }, equipped = { aura = "aura_spark" } } }, { { looks = {}, equipped = {} } } },

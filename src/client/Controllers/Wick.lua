@@ -49,7 +49,10 @@ local function find(target, floor)
 	if target == "lift" then return camp and camp:FindFirstChild("Lift") end
 	if target == "liftHome" then return fl and fl:FindFirstChild("Lift") end
 	if target == "guardian" then return fl and fl:FindFirstChild("GuardianRing") end
-	if target == "pillar" then return fl and nearest(fl:FindFirstChild("Pets"), function(b) return b:FindFirstChild("Pillar") ~= nil end) end
+	if target == "pillar" then
+		local asked = require(script.Parent.TrustTap).asked
+		return fl and nearest(fl:FindFirstChild("Pets"), function(b) return b:FindFirstChild("Pillar") ~= nil and not asked[b:GetAttribute("PetId")] end)
+	end
 	if target == "pet" then return fl and nearest(fl:FindFirstChild("Pets")) end
 end
 

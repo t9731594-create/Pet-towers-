@@ -58,8 +58,22 @@ function Team.init()
 	end)
 	action(2, "+<3", Color3.fromRGB(255, 150, 190), function(id) Remotes.get("Heart"):FireServer(id) end)
 	action(3, "bye", Color3.fromRGB(190, 190, 200), function(id) Remotes.get("Release"):FireServer(id) Team.selected = nil end)
-	action(4, "X", Color3.fromRGB(240, 240, 240), function() end)
-	actions[4].Activated:Connect(function() panel.Visible = false end)
+	action(4, "pad", Color3.fromRGB(250, 235, 150), function(id)
+		local p = HUD.state
+		local byId = {}
+		for _, pet in ipairs(p.pets) do byId[pet.id] = pet end
+		local best, bestIncome
+		for i, pad in ipairs(p.pads) do
+			if pad.pet == id then return end -- already on a pad
+			local income = pad.pet ~= 0 and byId[pad.pet] and F.wildIncome(byId[pad.pet]) or -1
+			if not bestIncome or income < bestIncome then best, bestIncome = i, income end
+		end
+		if best then Remotes.get("Place"):FireServer(id, best) end
+	end)
+	local close = Instance.new("TextButton")
+	close.AnchorPoint = Vector2.new(1, 0) close.Position = UDim2.new(1, -8, 0, 8) close.Size = UDim2.fromOffset(48, 48)
+	close.Text = "X" close.Font = Enum.Font.FredokaOne close.TextScaled = true close.BackgroundColor3 = Color3.fromRGB(240, 240, 240) close.Parent = panel
+	close.Activated:Connect(function() panel.Visible = false end)
 	open.Activated:Connect(function()
 		panel.Visible = not panel.Visible
 		if panel.Visible and HUD.state then draw(HUD.state) end

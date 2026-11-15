@@ -21,6 +21,10 @@ Paste this to Claude Code on the Mac (SanDisk mounted), or follow it by hand.
 None of src/server/Services or src/client has ever run in Roblox. Press Play, read the Output window top
 to bottom, fix, repeat. Keep the pure rules (src/server/Core, src/shared/Logic) passing their tests.
 
+Read `docs/BUGS_FOUND_HEADLESS.md` first: its "Needs Studio" list names the behaviours a fake engine could
+not settle (spawn placement, Touched on arrival, streaming, clocks, welded balls and walking). Check those
+before the checklist. The suite's boot tests (`tests/test_boot_*.lua`) show how each scenario is driven.
+
 ## 4. Studio tests, in order (write real numbers into docs/STATUS.md)
 M1
 - [ ] Spawn faces three pedestals; walking into one picks the starter. Time from spawn to starter: ___ s

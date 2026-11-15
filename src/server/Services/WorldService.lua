@@ -46,6 +46,11 @@ local function buildCamp(i, root)
 	local zone = part({ Name = "Zone", Size = Vector3.new(90, 12, 90), Position = center + Vector3.new(0, 6, 0), Transparency = 1, CanCollide = false }, folder)
 	local camp = { index = i, center = center, folder = folder, ground = ground, zone = zone, pads = {}, pedestals = {}, owner = nil }
 	camp.spawn = facing * CFrame.new(0, 0, 14)
+	local sl = Instance.new("SpawnLocation")
+	sl.Name = "Spawn" sl.Anchored = true sl.Size = Vector3.new(6, 1, 6) sl.Transparency = 1 sl.CanCollide = false
+	sl.CFrame = camp.spawn * CFrame.new(0, -3, 0) sl.Enabled = false -- used only as this camp owner's RespawnLocation
+	sl.Parent = folder
+	camp.spawnLocation = sl
 	-- three starters on pedestals straight ahead of the spawn
 	for s, species in ipairs(Config.Pets.StarterOrder) do
 		local cf = facing * CFrame.new((s - 2) * 8, -1.5, -2)
@@ -119,6 +124,10 @@ function World.init()
 	}
 	part({ Name = "Tower", Shape = Enum.PartType.Cylinder, Size = Vector3.new(300, 40, 40), CFrame = CFrame.new(0, 150, 0) * CFrame.Angles(0, 0, math.rad(90)),
 		Color = Color3.fromRGB(250, 240, 215) }, root)
+	-- where a character appears before its camp is known: on the plaza, well clear of the tower
+	local hubSpawn = Instance.new("SpawnLocation")
+	hubSpawn.Name = "HubSpawn" hubSpawn.Anchored = true hubSpawn.Size = Vector3.new(12, 1, 12) hubSpawn.Transparency = 1 hubSpawn.CanCollide = false
+	hubSpawn.Position = Vector3.new(0, 0.5, 100) hubSpawn.Parent = root
 	for i = 1, 7 do World.camps[i] = buildCamp(i, root) end
 	for f = 1, World.BuiltFloors do World.floors[f] = buildFloor(f, root) end
 	World.tutorialPets = Instance.new("Folder") World.tutorialPets.Name = "TutorialPets" World.tutorialPets.Parent = root
@@ -126,7 +135,11 @@ end
 
 function World.claimCamp(player)
 	for _, camp in ipairs(World.camps) do
-		if not camp.owner then camp.owner = player return camp end
+		if not camp.owner then
+			camp.owner = player
+			pcall(function() player.RespawnLocation = camp.spawnLocation end)
+			return camp
+		end
 	end
 end
 function World.campOf(player)

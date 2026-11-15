@@ -26,9 +26,9 @@ function tests.a01_server_starts_and_creates_every_remote()
 		if not names[name] then n = n + 1 end
 		names[name] = true
 	end
-	T.eq(n, 27 + 22 - 1, "27 client-to-server and 22 server-to-client names; Emote goes both ways")
+	T.eq(n, 27 + 23 - 1, "27 client-to-server and 23 server-to-client names; Emote goes both ways")
 	T.eq(#world.services.ReplicatedStorage.PetTowerRemotes:GetChildren(), n, "exactly one RemoteEvent per name")
-	T.eq(#world.workspace.PetTowerWorld:GetChildren(), 1 + 5 + 1 + 7 + 5 + 1, "hub, 5 hub parts, tower, 7 camps, 5 floors, tutorial folder")
+	T.eq(#world.workspace.PetTowerWorld:GetChildren(), 1 + 1 + 5 + 1 + 7 + 5 + 1, "hub, hub spawn, 5 hub parts, tower, 7 camps, 5 floors, tutorial folder")
 	Mock.step(300) -- five minutes of an empty server
 	H.clean("empty server")
 end
@@ -227,6 +227,25 @@ function tests.b06_walking_home_into_the_camp_zone_deposits()
 end
 
 -- M2 -----------------------------------------------------------------------------------------------------
+function tests.c00_lift_offers_a_floor_menu_once_floor_2_is_open()
+	local world = H.fresh()
+	local ann, c = H.join(world, 101, "Ann")
+	H.chooseStarter(world, ann)
+	H.tutorialCatch(world, ann, c)
+	H.deposit(world, ann)
+	H.debug(c, "clear", 1)
+	local camp = H.camp(world, ann)
+	c:clear()
+	H.walkToPart(world, ann, camp.Lift)
+	world:trigger(camp.LiftPrompt, ann)
+	Mock.step(0.5)
+	T.eq(ann:GetAttribute("Floor"), 0, "the lift waits for a choice")
+	T.eq(H.payload(c, "LiftMenu"), 2)
+	H.lift(world, ann, c, 1)
+	T.eq(ann:GetAttribute("Floor"), 1, "Floor 1 can be visited again")
+	H.lift(world, ann, c, 3)
+	T.eq(ann:GetAttribute("Floor"), 1, "a locked floor is refused")
+end
 function tests.c01_lift_to_floor_1_spawns_the_guaranteed_rare()
 	local world = H.fresh()
 	local ann, c = H.join(world, 101, "Ann")

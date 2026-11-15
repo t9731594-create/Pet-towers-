@@ -41,7 +41,10 @@ function Floors.init()
 	for _, camp in ipairs(World.camps) do
 		camp.LiftPrompt.Triggered:Connect(function(player)
 			local profile = camp.owner == player and Data.get(player)
-			if profile then Floors.go(player, profile, math.min(Profile.unlockedFloor(profile), World.BuiltFloors)) end
+			if not profile then return end
+			local top = math.min(Profile.unlockedFloor(profile), World.BuiltFloors)
+			-- one floor open: just ride (no menus in the first minutes). More: choose with number buttons.
+			if top <= 1 then Floors.go(player, profile, top) else Net.send(player, "LiftMenu", top) end
 		end)
 	end
 	for _, floor in pairs(World.floors) do

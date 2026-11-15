@@ -1,6 +1,6 @@
 # Status
 
-**Milestone:** M0-M6 rules and greybox services, the weekly systems and Amendment 1 are written on `dev`, headless-tested only: check_lua 85 files, 0 syntax errors; tests 166 passed, 0 failed. Waiting for the Mac for every Studio test and for the owner's OK before `dev` goes into `main`.
+**Milestone:** M0-M6 rules, greybox services and client, the weekly systems and Amendment 1 are written on `dev`. Tested headless only, now including a boot of the real server and client against a stand-in for the Roblox engine: check_lua 96 files, 0 syntax errors; tests 238 passed, 0 failed. Nothing has run in real Studio. Waiting for the Mac, and for the owner's OK before `dev` goes into `main`.
 **Owner account:** FantasyGaming (@Talleyrandw).
 **Where this lives:** github.com/t9731594-create/Pet-towers- (`main` = M0, `dev` = current, plus the five Amendment 1 branches). Not yet on the SanDisk.
 
@@ -24,6 +24,14 @@
   - bot that buys pads when full: 5.6 / 18.2 / 61.1 / 151.2 / 301.8
   - Evolutions (pads bot): Lv 5 at 5.0 min, Lv 25 at 18.3 min (right after the first break), Lv 42 at 130.6 min (day 4).
   - The table does NOT match B9 exactly: Guardians 4 and 5 are 7% and 16% late even with pads. No values were retuned.
+
+## Engine stand-in (tools/roblox_mock.lua)
+- tests/test_boot_server.lua, test_boot_client.lua and test_boot_soak.lua start the real Main scripts against a
+  fake engine and play the Studio checklist scenarios with fake players. Seven real bugs were found and fixed
+  this way before any Studio run (docs/BUGS_FOUND_HEADLESS.md), plus lift floor choice, pad swapping, taps on
+  the thumbstick no longer counting as ring taps, and spawn points clear of the tower.
+- The stand-in cannot settle physics, touches, streaming, layout, real DataStores or timing: see the
+  "Needs Studio" list in docs/BUGS_FOUND_HEADLESS.md and check those first on the Mac.
 
 ## Not done / cannot be done here
 - Nothing has run in Roblox Studio. Every file under src/server/Services and src/client is unverified

@@ -14,5 +14,7 @@ for _, name in ipairs({ "WildShowdownService", "SecretService", "ReturnService",
 	local module = Services:FindFirstChild(name)
 	if module then require(module).init() end
 end
-require(Services.DataService).init() -- last: players start loading once everything is listening
+local Data = require(Services.DataService)
+require(Services.FriendService).onFriends = function(a, b) Data.push(a) Data.push(b) end
+Data.init() -- last: players start loading once everything is listening
 print("[PetTower] server ready")

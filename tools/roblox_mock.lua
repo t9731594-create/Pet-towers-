@@ -897,6 +897,7 @@ defclass("BasePart", "PVInstance", { creatable = false,
 		PivotTo = function(inst, c) inst.CFrame = c end,
 	} })
 defclass("Part", "BasePart", { props = "Shape:Enum:PartType" })
+defclass("SpawnLocation", "Part", { props = "Enabled:boolean Neutral:boolean" })
 defclass("MeshPart", "BasePart", { creatable = false })
 defclass("Model", "PVInstance", { props = "PrimaryPart:Instance:BasePart WorldPivot:CFrame", methods = {
 	GetPivot = function(inst)
@@ -1328,7 +1329,7 @@ defclass("CaptureService", "Instance", { creatable = false, service = true, meth
 } })
 
 defclass("Player", "Instance", { creatable = false,
-	props = "UserId:ro:int DisplayName:ro:string Character:Instance:Model AccountAge:ro:int",
+	props = "UserId:ro:int DisplayName:ro:string Character:Instance:Model AccountAge:ro:int RespawnLocation:Instance:SpawnLocation",
 	signals = "CharacterAdded CharacterRemoving", methods = {
 		Kick = function(inst, message)
 			requireServer("Player:Kick")

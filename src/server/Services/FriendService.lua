@@ -8,6 +8,7 @@ local function key(a, b) if a > b then a, b = b, a end return a .. ":" .. b end
 local function check(player, other)
 	local ok, are = pcall(function() return player:IsFriendsWithAsync(other.UserId) end)
 	Friends.pairs[key(player.UserId, other.UserId)] = (ok and are) or nil
+	if ok and are and Friends.onFriends then Friends.onFriends(player, other) end
 end
 
 function Friends.are(a, b) return Friends.pairs[key(a, b)] == true end

@@ -44,6 +44,18 @@ any tuning change, re-run it and show the owner the table next to the targets (4
 - `buyPads` matters a lot from Guardian 4 on. Say which mode a table used.
 - Tuning values are prices: propose with a before/after table, do not apply without approval.
 
+## Boot tests: running the real server and client against a fake engine
+`tools/roblox_mock.lua` is a strict stand-in for the Roblox API surface this game uses. The
+`tests/test_boot_*.lua` files start the real `Main.server.lua` / `Main.client.lua` against it and
+drive scenarios through remotes, touches and prompts with fake players (`tests/boot_helpers.lua` has
+the helpers: join, chooseStarter, tutorialCatch, deposit, lift, debug, playTry, cheerUntil).
+- The mock raises "is not a valid member" for unknown properties and methods, like Roblox. When you
+  use a new engine class or property, add it to the mock from the Creator docs; do not loosen it.
+- Some boot tests pin counts (remotes, world parts). Update the number in the same commit as the
+  change, with the reason in the message string.
+- Add a boot test for every new remote, station or service. `python3 tools/lua.py tools/cover_boot.lua`
+  lists service and client lines the boot tests never ran (slow: about 90 s).
+
 ## What headless tests cannot tell you
 Anything the engine decides: physics, touches, streaming, GUI layout, real DataStores, timing on a
 phone. Those need the Studio checklist (see the pettower-studio skill). Never report a headless pass

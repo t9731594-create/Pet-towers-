@@ -59,6 +59,7 @@ Remotes.S2C = {
 	"Week", -- ({ week, guardian, merchantOpen, items = { { slot, kind, id, price, bought } }, tally = { dawn, dusk }, lastLeader, trim, monument = { [floor] = { names } } })
 	"WeeklyChoice", -- ()  show the Share / Keep buttons after a Weekly Guardian win
 	"Index", -- (IndexView rows)
+	"LiftMenu", -- (highest floor the player may ride to)  shown at the camp lift once Floor 2 is open
 	"Mail", -- ({ journeyDay, tomorrow = { minutes, look }, egg = { state, readyAt }, codes = bool })
 	"Closet", -- ({ looks = { id, ... }, equipped = { slot = id } })
 	"ClipMoment", -- ({ kind = "wild_legendary" | "secret" | ..., floor })  offer a capture where allowed
