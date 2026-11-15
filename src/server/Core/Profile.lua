@@ -355,6 +355,19 @@ function Profile.chooseForm(p, form)
 	return true
 end
 
+-- Settings (bible B12) ---------------------------------------------------------
+function Profile.setSetting(p, key, value)
+	local cur = p.settings[key]
+	if cur == nil then return false, "bad_key" end
+	if type(cur) == "boolean" then
+		if type(value) ~= "boolean" then return false, "bad_value" end
+	else
+		if type(value) ~= "number" or value ~= value or value < 0 or value > 1 then return false, "bad_value" end
+	end
+	p.settings[key] = value
+	return true
+end
+
 -- Floors --------------------------------------------------------------------
 function Profile.canEnter(p, floor)
 	return floor >= 1 and floor <= Profile.unlockedFloor(p) and p.starter ~= nil

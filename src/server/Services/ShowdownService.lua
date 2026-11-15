@@ -11,7 +11,8 @@ local Data = require(script.Parent.DataService)
 local World = require(script.Parent.WorldService)
 local Friends = require(script.Parent.FriendService)
 
-local Showdown = { active = {}, cooldown = {}, lostAt = {}, byPlayer = {} }
+local Showdown = { active = {}, cooldown = {}, lostAt = {}, byPlayer = {}, onClear = {} }
+-- onClear: listeners fn(player, profile, floor) for a player's first clear of a floor
 -- byPlayer[player] = the ShowdownCore session that player's cheers go to (guardian or any other kind)
 
 local function snapshot(sd)
@@ -54,6 +55,9 @@ local function finish(f, sd)
 			local first = false
 			if won then
 				first = Profile.clearFloor(profile, f)
+				if first then
+					for _, fn in ipairs(Showdown.onClear) do task.spawn(fn, player, profile, f) end
+				end
 				if first and f == 1 then Profile.funnel(profile, "FirstGuardianWin", os.time()) end
 				if #ids >= 2 then Profile.funnel(profile, "FirstCoopShowdown", os.time()) end
 				if not first then

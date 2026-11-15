@@ -28,13 +28,18 @@ function Choice.init()
 	local function show(m, f) mode, floor = m, f holder.Visible = true end
 	share.Activated:Connect(function()
 		holder.Visible = false
-		if mode == "floor" then Remotes.get("Choose"):FireServer(floor, "share") else Remotes.get("ChooseForm"):FireServer("dawn") end
+		if mode == "floor" then Remotes.get("Choose"):FireServer(floor, "share")
+		elseif mode == "weekly" then Remotes.get("ChooseWeekly"):FireServer("share")
+		else Remotes.get("ChooseForm"):FireServer("dawn") end
 	end)
 	keep.Activated:Connect(function()
 		holder.Visible = false
-		if mode == "floor" then Remotes.get("Choose"):FireServer(floor, "keep") else Remotes.get("ChooseForm"):FireServer("dusk") end
+		if mode == "floor" then Remotes.get("Choose"):FireServer(floor, "keep")
+		elseif mode == "weekly" then Remotes.get("ChooseWeekly"):FireServer("keep")
+		else Remotes.get("ChooseForm"):FireServer("dusk") end
 	end)
 	Remotes.get("ChoicePrompt").OnClientEvent:Connect(function(f) show("floor", f) end)
+	Remotes.get("WeeklyChoice").OnClientEvent:Connect(function() task.delay(2.5, function() show("weekly") end) end)
 	Remotes.get("ShowdownEnd").OnClientEvent:Connect(function(r)
 		if r.kind == "guardian" and r.won and r.firstClear then task.delay(2.5, function() show("floor", r.floor) end) end
 	end)

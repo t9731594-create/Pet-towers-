@@ -24,6 +24,11 @@ Remotes.C2S = {
 	HatchEgg = { rate = 1, burst = 2 }, -- ()
 	Emote = { rate = 0.5, burst = 3 }, -- (index 1..6)
 	RedeemCode = { rate = 0.2, burst = 2 }, -- (code string, 24 characters at most)
+	MerchantBuy = { rate = 1, burst = 3 }, -- (slot 1..3)  weekends only, coins only
+	ChooseWeekly = { rate = 1, burst = 2 }, -- ("share" | "keep")  after a Weekly Guardian win
+	SetSetting = { rate = 2, burst = 6 }, -- (key, value)
+	IndexOpen = { rate = 1, burst = 2 }, -- ()
+	Debug = { rate = 5, burst = 10 }, -- (command, argument)  Studio only: ignored in a live game
 }
 
 -- Server -> client.
@@ -47,6 +52,9 @@ Remotes.S2C = {
 	"Shared", -- ({ userId, name, coins })  "<name> shared!"  (keeping is never announced)
 	"EggHatched", -- ({ species, rarity, radiant })
 	"Emote", -- (userId, index)
+	"Week", -- ({ week, guardian, merchantOpen, items = { { slot, kind, id, price, bought } }, tally = { dawn, dusk }, lastLeader, trim, monument = { [floor] = { names } } })
+	"WeeklyChoice", -- ()  show the Share / Keep buttons after a Weekly Guardian win
+	"Index", -- (IndexView rows)
 	"ClipMoment", -- ({ kind = "wild_legendary" | "secret" | ..., floor })  offer a capture where allowed
 }
 

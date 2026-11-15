@@ -125,6 +125,22 @@ Economy.Passes = { DoubleCoinsMult = 2, BiggerStack = 2, CampPads = 8, AutoColle
 Economy.ShopButtonAfterSeconds = 300 -- nothing is sold in the first 5 minutes
 Economy.CodeMaxSeconds = 600 -- a code gives a look or at most 10 minutes of income
 
+-- The week (bible B7, B14). Weeks start on Saturday 00:00 UTC. Everything here comes back: nothing is
+-- "last chance". Coin prices are untested proposals.
+Economy.Weekly = {
+	-- Weekly Guardian (hub): the meter scales to the players in the ring. Meter = the ring's summed Team
+	-- Power x 40 s x factor. Solo 1.45 (needs near-perfect cheers: Perfect cheering is +50%), falling to
+	-- 1.0 with 7 players (a full ring wins without cheering).
+	SoloFactor = 1.45, FullFactor = 1.0, FullRing = 7,
+	MerchantDays = { 6, 0 }, -- Saturday, Sunday (0 = Sunday, UTC)
+	-- Merchant prices in seconds of the highest floor's Common income (so they scale with the climb).
+	MerchantLookSeconds = 1200, MerchantPetSeconds = 900, MerchantDecorSeconds = 600,
+	MerchantLooks = { "aura_bubble", "trail_petal", "aura_ember", "trail_star" },
+	MerchantDecor = { "decor_windmill", "decor_campfire", "decor_fountain", "decor_kite" },
+	MonumentNames = 10, -- first players to clear the newest floor
+	TrimLook = "trim_week", -- the leading side wears this trim the next week
+}
+
 -- Natures: key beats value.
 Economy.NatureBeats = { Ember = "Leaf", Leaf = "Tide", Tide = "Ember" }
 

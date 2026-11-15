@@ -73,6 +73,7 @@ local function buildCamp(i, root)
 	station("Lift", 22, 6, Color3.fromRGB(255, 240, 180), "Lift")
 	station("EggNest", 22, 16, Color3.fromRGB(255, 250, 235), "Egg")
 	station("Mailbox", 22, 26, Color3.fromRGB(150, 200, 255), "Mail")
+	station("IndexBoard", -22, 26, Color3.fromRGB(210, 190, 140), "Index")
 	return camp
 end
 
@@ -98,7 +99,16 @@ end
 
 function World.init()
 	local root = Instance.new("Folder") root.Name = "PetTowerWorld" root.Parent = workspace
-	part({ Name = "Hub", Size = Vector3.new(160, 1, 160), Position = Vector3.new(0, 0, 0), Color = Color3.fromRGB(225, 215, 190) }, root)
+	-- one plaza under everything so camps and hub are joined by walkable ground
+	part({ Name = "Hub", Size = Vector3.new(460, 1, 460), Position = Vector3.new(0, -0.3, 0), Color = Color3.fromRGB(225, 215, 190) }, root)
+	World.hub = {
+		weeklyRing = part({ Name = "WeeklyRing", Shape = Enum.PartType.Cylinder, Size = Vector3.new(1, 44, 44), CanCollide = false,
+			CFrame = CFrame.new(60, 0.8, 0) * CFrame.Angles(0, 0, math.rad(90)), Color = Color3.fromRGB(255, 220, 140), Material = Enum.Material.Neon, Transparency = 0.6 }, root),
+		weeklyGuardian = part({ Name = "WeeklyGuardian", Shape = Enum.PartType.Ball, Size = Vector3.new(22, 22, 22), Position = Vector3.new(60, 12, -34), Color = Color3.fromRGB(200, 190, 150) }, root),
+		merchant = part({ Name = "Merchant", Size = Vector3.new(6, 8, 6), Position = Vector3.new(-60, 4, 0), Color = Color3.fromRGB(255, 140, 160) }, root),
+		monument = part({ Name = "Monument", Size = Vector3.new(4, 14, 4), Position = Vector3.new(0, 7, -60), Color = Color3.fromRGB(240, 235, 220) }, root),
+		scale = part({ Name = "DawnDuskScale", Size = Vector3.new(12, 2, 3), Position = Vector3.new(0, 4, 60), Color = Color3.fromRGB(200, 200, 200) }, root),
+	}
 	part({ Name = "Tower", Shape = Enum.PartType.Cylinder, Size = Vector3.new(300, 40, 40), CFrame = CFrame.new(0, 150, 0) * CFrame.Angles(0, 0, math.rad(90)),
 		Color = Color3.fromRGB(250, 240, 215) }, root)
 	for i = 1, 7 do World.camps[i] = buildCamp(i, root) end

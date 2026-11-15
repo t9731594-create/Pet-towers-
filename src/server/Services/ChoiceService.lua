@@ -15,6 +15,8 @@ function Choice.init()
 		local ok, r = Profile.choose(profile, floor, choice)
 		if not ok then return end
 		Profile.funnel(profile, "FirstChoice", os.time())
+		local weekly = script.Parent:FindFirstChild("WeeklyService")
+		if weekly then require(weekly).addPoint(choice == "share" and "dawn" or "dusk") end
 		if r.selfSeconds > 0 then
 			Net.send(player, "Coins", Profile.grantIncome(profile, r.selfSeconds, "keep", CoinMult(player, profile)), "keep")
 		end
