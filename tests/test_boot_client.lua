@@ -496,6 +496,7 @@ function tests.e01_every_server_to_client_remote()
 		H.clean(name .. " after a moment")
 	end
 	T.ok(fired >= 50, "fired " .. fired .. " payloads")
+	if SOAK_REPORT then print("payloads fired: " .. fired) end
 	Mock.step(60) -- timers, tweens and banners run out
 	H.clean("a minute later")
 	-- what a few of them left on the screen

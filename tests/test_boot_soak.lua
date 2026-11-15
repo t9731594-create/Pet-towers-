@@ -1,6 +1,7 @@
 -- Three bots play for 20 fake minutes through real clients: walk to pets (the client starts the tries),
 -- tap on the rings with human timing, cheer, ride home, feed, try the Guardian. One of them leaves and
 -- comes back. Nothing may error, break an engine rule or warn, and the saves must stay consistent.
+-- Set the global SOAK_REPORT = true before running to print how much the bots did.
 local H = runfile(ROOT .. "/tests/boot_helpers.lua")
 local Mock = H.Mock
 local V3 = Mock.Vector3
