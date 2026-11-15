@@ -31,7 +31,8 @@ function Profile.new(now)
 		settings = { music = 1, effects = 1, lowGraphics = false, tapAssist = false, reducedFlash = false },
 		tutorial = 0,
 		assist = { misses = 0, catchesLeft = 0 },
-		stats = { catches = 0, tries = 0, sources = {}, sinks = {}, funnel = {} },
+		stats = { catches = 0, tries = 0, sources = {}, sinks = {}, funnel = {},
+			wild = { started = 0, coop = 0, finished = 0 } }, -- Amendment 1 (bible C3)
 	}
 	for i = 1, E.Pads.Start do p.pads[i] = { pet = 0, since = now } end
 	return p

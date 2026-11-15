@@ -13,7 +13,7 @@ function TapCore.ringTime(opts)
 	local deficit = math.max(0, (opts.floor or 1) - (opts.charm or 1))
 	t = t * (1 - T.CharmSpeedPerTier) ^ deficit
 	if opts.assist then t = t * (1 + T.AssistSlow) end
-	if opts.friendly then t = t * (1 + T.AssistSlow) end
+	if opts.friendly then t = t * (1 + E.Wild.FriendlySlow) end
 	return t
 end
 

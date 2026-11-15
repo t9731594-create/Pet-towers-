@@ -6,8 +6,9 @@ Economy.StartCoins = 50
 
 -- Rarity order is the index used everywhere (1 = Common ... 5 = Legendary).
 Economy.Rarities = { "Common", "Uncommon", "Rare", "Epic", "Legendary" }
-Economy.RarityIncomeMult = { Common = 1, Uncommon = 2, Rare = 3.5, Epic = 6, Legendary = 10 }
-Economy.RarityPowerMult = { Common = 1, Uncommon = 1.5, Rare = 2.5, Epic = 4, Legendary = 7 }
+-- "Secret" is a sixth rarity that never comes from the spawn roll (Amendment 1): see Economy.Secret.
+Economy.RarityIncomeMult = { Common = 1, Uncommon = 2, Rare = 3.5, Epic = 6, Legendary = 10, Secret = 20 }
+Economy.RarityPowerMult = { Common = 1, Uncommon = 1.5, Rare = 2.5, Epic = 4, Legendary = 7, Secret = 10 }
 
 -- Wild spawn odds per floor (percent), shown in the index. Nothing purchasable changes these.
 Economy.SpawnOdds = { Common = 60, Uncommon = 25, Rare = 10, Epic = 4, Legendary = 1 }
@@ -45,7 +46,7 @@ Economy.NightLanternPrice = 250000 -- untested guess
 Economy.Tap = {
 	PerfectWindow = 0.080,
 	GoodWindow = 0.200,
-	RingTime = { Common = 1.2, Uncommon = 1.0, Rare = 0.8, Epic = 0.65, Legendary = 0.5 },
+	RingTime = { Common = 1.2, Uncommon = 1.0, Rare = 0.8, Epic = 0.65, Legendary = 0.5, Secret = 0.5 },
 	-- hits = rings that are Good or better; perfects = rings that are Perfect.
 	Need = {
 		Common = { hits = 1, perfects = 0 },
@@ -53,6 +54,7 @@ Economy.Tap = {
 		Rare = { hits = 2, perfects = 1 },
 		Epic = { hits = 3, perfects = 2 },
 		Legendary = { hits = 3, perfects = 3 },
+		Secret = { hits = 3, perfects = 3 },
 	},
 	Beats = 3,
 	GapSeconds = 0.25, -- pause between one ring landing and the next starting
@@ -80,6 +82,24 @@ Economy.Showdown = {
 	NatureMult = 1.5,
 }
 
+-- Amendment 1: wild showdowns (play first, then catch). Epic, Legendary and Secret pets have a Play
+-- meter = the floor's Guardian power x MeterMult. Teams drain it at Team Power per second.
+Economy.Wild = {
+	MeterMult = { Epic = 4, Legendary = 10, Secret = 150 },
+	FriendlySlow = 0.20, -- rings 20% slower once the pet has played with you
+	JoinDistance = 20, -- studs from the pet to step in
+	TryGraceSeconds = 12, -- a played-out pet stays at least this long so everyone gets their try
+}
+
+-- Amendment 1: Secret pets. One per floor, appears when the floor's lantern chimes, about 3 times a
+-- day at times every server derives from the UTC clock. Income and power multipliers are untested.
+Economy.Secret = {
+	Rarity = "Secret",
+	StaySeconds = 180,
+	ChimesPerDay = 3,
+	GlowSeconds = 60, -- the lantern glow builds for this long before the pet appears
+}
+
 -- Natures: key beats value.
 Economy.NatureBeats = { Ember = "Leaf", Leaf = "Tide", Tide = "Ember" }
 
@@ -97,6 +117,7 @@ Economy.Sim = {
 	BreakIncomeSeconds = 3600,
 	CheerBonus = 0.20,
 	TargetWinMinutes = { 4, 15, 58, 141, 260 },
+	ExtraTrySeconds = { Epic = 5, Legendary = 12 }, -- Amendment 1: play time before the catch try
 }
 
 return Economy

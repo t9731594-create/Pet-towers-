@@ -27,8 +27,9 @@ function t.short() T.eq(F.short(999), "999") T.eq(F.short(1200), "1.2K") T.eq(F.
 function t.config_complete()
 	local C = require(Shared.Config)
 	local n = 0
-	for _ in pairs(C.Pets.Wild) do n = n + 1 end
+	for _, def in pairs(C.Pets.Wild) do if def.rarity ~= "Secret" then n = n + 1 end end
 	T.eq(n, 25)
+	for f = 1, 5 do T.eq(C.Pets.Wild[C.Pets.ByFloor[f].Secret].rarity, "Secret") end
 	for f = 1, 5 do for _, r in ipairs(C.Economy.Rarities) do T.ok(C.Pets.ByFloor[f][r], f .. r) end end
 	local odds = 0
 	for _, v in pairs(C.Economy.SpawnOdds) do odds = odds + v end

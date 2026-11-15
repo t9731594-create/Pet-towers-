@@ -18,6 +18,7 @@ Remotes.C2S = {
 	ShowdownJoin = { rate = 1, burst = 2 }, -- ()
 	Cheer = { rate = 4, burst = 6 }, -- (offset seconds since the showdown's start)
 	CallHelp = { rate = 0.1, burst = 1 }, -- ()
+	WildJoin = { rate = 1, burst = 3 }, -- (petId)  Amendment 1: step in to play with an Epic+ pet
 }
 
 -- Server -> client.
@@ -32,6 +33,11 @@ Remotes.S2C = {
 	"ShowdownEnd", -- ({ floor, won, firstClear, kind })
 	"CheerGrade", -- (grade)
 	"Coins", -- (amount, source)  for coin pops
+	-- Amendment 1. Wild showdowns reuse ShowdownState / ShowdownEnd / Cheer / CheerGrade with
+	-- kind = "wild" and two extra fields: petId, rarity. ShowdownEnd for kind "wild" carries
+	-- { kind, petId, won = true (meter empty: you may now try) | false (the pet left) }.
+	"SecretChime", -- ({ floor, phase = "glow" | "here" | "gone", at, leaves })  times are UTC seconds
+	"ClipMoment", -- ({ kind = "wild_legendary" | "secret" | ..., floor })  offer a capture where allowed
 }
 
 Remotes.FolderName = "PetTowerRemotes"

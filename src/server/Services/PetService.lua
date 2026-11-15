@@ -12,8 +12,31 @@ local Data = require(script.Parent.DataService)
 local World = require(script.Parent.WorldService)
 
 local Pets = { floors = {}, tries = {}, tutorial = {}, hooks = {} }
--- hooks.beforeTry(player, profile, pet) -> false, reason  blocks a try (used by later features)
--- hooks.tryOptions(player, profile, pet, opts)            may edit the ring options
+-- CONTRACT: hooks for other services. Register with Pets.hook(name, fn); several services may listen.
+--   beforeTry(player, profile, pet) -> false   blocks a try
+--   tryOptions(player, profile, pet, opts)     may edit the ring options (e.g. opts.friendly = true)
+--   afterTry(player, profile, pet, result)
+--   petSpawned(pet, ball)                      a shared wild pet appeared (not the tutorial pet)
+--   keepPet(pet, now) -> true                  keeps a pet past its leave time
+--   petLeft(pet)
+function Pets.hook(name, fn)
+	Pets.hooks[name] = Pets.hooks[name] or {}
+	table.insert(Pets.hooks[name], fn)
+end
+-- Runs every listener. Returns false if any returned false, true if any returned true, else nil.
+local function run(name, ...)
+	local out
+	for _, fn in ipairs(Pets.hooks[name] or {}) do
+		local r = fn(...)
+		if r == false then return false end
+		if r == true then out = true end
+	end
+	return out
+end
+function Pets.partOf(pet)
+	local fl = Pets.floors[pet.floor]
+	return fl and fl.parts[pet.id]
+end
 
 local function root(player)
 	local ch = player.Character
@@ -51,6 +74,7 @@ function Pets.spawnOn(f, forced, position)
 	local fl = Pets.floors[f]
 	local pet = SpawnCore.spawn(fl.core, Net.now(), forced)
 	fl.parts[pet.id] = makePart(pet, position or randomSpot(World.floors[f]), World.floors[f].pets)
+	run("petSpawned", pet, fl.parts[pet.id])
 	if pet.pillar then Net.all("Banner", { kind = "pillar", floor = f, rarity = pet.rarity, radiant = pet.radiant }) end
 	return pet
 end
@@ -113,7 +137,7 @@ local function finish(player)
 	end
 	Net.send(player, "TryEnd", result)
 	Data.push(player)
-	if Pets.hooks.afterTry then Pets.hooks.afterTry(player, profile, pet, result) end
+	run("afterTry", player, profile, pet, result)
 end
 
 local function tryStart(player, profile, petId)
@@ -125,16 +149,13 @@ local function tryStart(player, profile, petId)
 	if not hrp or (hrp.Position - ball.Position).Magnitude > E.Tap.MaxDistance then return end
 	local now = Net.now()
 	if pet.tried[player.UserId] or now >= pet.leaves then return end
-	if Pets.hooks.beforeTry then
-		local ok = Pets.hooks.beforeTry(player, profile, pet)
-		if ok == false then return end
-	end
+	if run("beforeTry", player, profile, pet) == false then return end
 	SpawnCore.markTried(pet, player.UserId)
 	local opts = {
 		rarity = pet.rarity, floor = pet.floor, charm = profile.charm,
 		assist = Profile.assistOn(profile), cannotFail = profile.tutorial < 1,
 	}
-	if Pets.hooks.tryOptions then Pets.hooks.tryOptions(player, profile, pet, opts) end
+	run("tryOptions", player, profile, pet, opts)
 	local tl = TapCore.issue(opts, now)
 	Pets.tries[player] = { tl = tl, pet = pet, tutorial = pet.owner ~= nil }
 	Net.send(player, "TryBegin", { petId = pet.id, start = tl.start, beats = tl.beats, ringTime = tl.ringTime, rarity = pet.rarity })
@@ -185,14 +206,15 @@ function Pets.init()
 			end
 			for f, fl in pairs(Pets.floors) do
 				local spawned, left = SpawnCore.tick(fl.core, now, function(pet)
-					return busyPets[pet.id] or (Pets.hooks.keepPet and Pets.hooks.keepPet(pet, now))
+					return busyPets[pet.id] or run("keepPet", pet, now) == true
 				end)
 				for _, pet in ipairs(left) do
 					if fl.parts[pet.id] then fl.parts[pet.id]:Destroy() fl.parts[pet.id] = nil end
-					if Pets.hooks.petLeft then Pets.hooks.petLeft(pet) end
+					run("petLeft", pet)
 				end
 				for _, pet in ipairs(spawned) do
 					fl.parts[pet.id] = makePart(pet, randomSpot(World.floors[f]), World.floors[f].pets)
+					run("petSpawned", pet, fl.parts[pet.id])
 					if pet.pillar then Net.all("Banner", { kind = "pillar", floor = f, rarity = pet.rarity, radiant = pet.radiant }) end
 				end
 			end
