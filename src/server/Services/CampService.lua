@@ -38,6 +38,13 @@ function Camp.refresh(player, profile)
 	for species, st in pairs(camp.pedestals) do
 		st.ball.Transparency = profile.starter and 1 or 0
 	end
+	for f, block in ipairs(camp.trophy) do
+		local fl = profile.floors[tostring(f)]
+		local lit = fl and fl.cleared
+		block.Material = lit and Enum.Material.Neon or Enum.Material.SmoothPlastic
+		block.Color = (not lit and Color3.fromRGB(110, 110, 120)) or (fl.choice == "share" and Color3.fromRGB(255, 205, 90))
+			or (fl.choice == "keep" and Color3.fromRGB(150, 110, 235)) or Color3.fromRGB(240, 240, 240)
+	end
 end
 
 -- The starter follows at the player's side (greybox: a welded ball that grows with each stage).
@@ -140,6 +147,14 @@ local function wire(camp)
 	camp.CharmBenchPrompt.Triggered:Connect(function(player)
 		local profile = camp.owner == player and Data.get(player)
 		if profile then buy(player, profile, "charm") end
+	end)
+	camp.PadPostPrompt.Triggered:Connect(function(player)
+		local profile = camp.owner == player and Data.get(player)
+		if profile then buy(player, profile, "pads") end
+	end)
+	camp.StackHookPrompt.Triggered:Connect(function(player)
+		local profile = camp.owner == player and Data.get(player)
+		if profile then buy(player, profile, "stack") end
 	end)
 end
 

@@ -74,6 +74,13 @@ local function buildCamp(i, root)
 	station("EggNest", 22, 16, Color3.fromRGB(255, 250, 235), "Egg")
 	station("Mailbox", 22, 26, Color3.fromRGB(150, 200, 255), "Mail")
 	station("IndexBoard", -22, 26, Color3.fromRGB(210, 190, 140), "Index")
+	station("PadPost", -32, 6, Color3.fromRGB(250, 235, 150), "Pads")
+	station("StackHook", -32, 16, Color3.fromRGB(180, 230, 255), "Stack")
+	-- Tower Trophy: one block per floor, lit gold (shared) or violet (kept) once cleared
+	camp.trophy = {}
+	for f = 1, Config.Floors.Count do
+		camp.trophy[f] = part({ Name = "Trophy" .. f, Size = Vector3.new(3, 2, 3), CFrame = facing * CFrame.new(32, -2 + f * 2, 16), Color = Color3.fromRGB(110, 110, 120) }, folder)
+	end
 	return camp
 end
 
