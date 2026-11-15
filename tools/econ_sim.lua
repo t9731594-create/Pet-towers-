@@ -39,6 +39,8 @@ end
 
 -- opts: buyPads = bool; noWild = bool (no play time before tries);
 -- extraTrySeconds = { Epic = n, Legendary = n } replaces Economy.Sim.ExtraTrySeconds.
+-- override = { trip = function(tripNumber, seconds, catches) return seconds, catches end } lets
+-- tools/tune.lua try a bot with shorter trips. Without it nothing changes.
 function Sim.run(seed, opts)
 	opts = opts or {}
 	local extra = Sim.extraTrySeconds(opts)
@@ -51,6 +53,7 @@ function Sim.run(seed, opts)
 	local wins, evo = {}, {}
 	local nextBreak = S.SessionSeconds
 	local maxT = 60 * 60 * 40
+	local tripHook, tripNumber = opts.override and opts.override.trip, 0
 
 	local function income()
 		local v = 0
@@ -123,9 +126,11 @@ function Sim.run(seed, opts)
 
 	while cleared < Config.Floors.Count and t < maxT do
 		local floor = math.min(charm, cleared + 1)
-		local trip = S.TripSeconds
+		local trip, catches = S.TripSeconds, S.CatchesPerTrip
+		tripNumber = tripNumber + 1
+		if tripHook then trip, catches = tripHook(tripNumber, trip, catches) end
 		local caught = {}
-		for _ = 1, S.CatchesPerTrip do
+		for _ = 1, catches do
 			local rarity = rollRarity(rand)
 			tries[rarity] = (tries[rarity] or 0) + 1
 			if extra[rarity] then
