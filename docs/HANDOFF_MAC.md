@@ -46,6 +46,15 @@ M5 / M6
 - [ ] Change lastSeen in the save to 16 hours ago and rejoin: chest, x2 rested, journey day 2.
 - [ ] Share after a first clear: every player gets coins and sees the banner. Keep: no banner.
 - [ ] Shop stays hidden (Config.Shop.Approved is false).
+Weekly and camp extras (use the Studio debug panel, bottom left: coins, levels, spawn Epic / Legendary / Secret, Away16h, Egg, Wipe)
+- [ ] Weekly Guardian ring in the hub: solo with Perfect cheers wins, solo without loses; reward look once, then Share / Keep.
+- [ ] Merchant: shows three items only on Saturday and Sunday UTC; each can be bought once; the Rare pet waits at camp.
+- [ ] Monument and Dawn-vs-Dusk scale show numbers after a minute (needs Studio API access for the global store).
+- [ ] Camp stations all answer: Snack Table, Charm Bench, Pad Post, Stack Hook, Egg Nest, Mailbox, Index Board, Closet, Lift.
+- [ ] Tower Trophy block lights gold after Share and violet after Keep.
+- [ ] Floor looks washed out until you clear it, then blooms to colour for you only.
+- [ ] Walk 40+ studs from a wild showdown: the ring closes; walk back: it reopens.
+- [ ] Settings gear: each of the five toggles survives a rejoin.
 Phone
 - [ ] Device emulator at 667x375: every button reachable, nothing under the notch, 30+ FPS.
 
