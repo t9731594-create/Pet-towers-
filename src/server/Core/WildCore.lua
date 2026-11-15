@@ -26,6 +26,7 @@ function WildCore.new(pet, nature, now)
 		petId = pet.id, floor = pet.floor, rarity = pet.rarity, nature = nature,
 		state = "active", -- "active" | "won" | "left"
 		took = {}, -- userId -> true: everyone who ever stepped in (kept when they step out)
+		far = {}, -- userId -> the time this player was first seen beyond the leash (nil = close)
 		tookCount = 0,
 		wonAt = nil,
 		sd = ShowdownCore.new({
@@ -50,6 +51,7 @@ function WildCore.join(session, userId, power, now)
 	local ok, why = ShowdownCore.join(session.sd, userId, power, now)
 	sync(session, now)
 	if not ok then return false, why end
+	session.far[userId] = nil
 	if not session.took[userId] then
 		session.took[userId] = true
 		session.tookCount = session.tookCount + 1
@@ -63,12 +65,46 @@ function WildCore.tick(session, now)
 	return sync(session, now)
 end
 
--- One player steps out (left the floor or the game). Their team stops adding; what was drained stays
--- drained, and they still count as having taken part.
+-- One player steps out (walked away, left the floor or the game). Their team stops adding; what was
+-- drained stays drained, and they still count as having taken part (they may step in again, and may
+-- try if the meter empties later).
 function WildCore.stepOut(session, userId, now)
+	session.far[userId] = nil
 	if session.state ~= "active" then return end
 	ShowdownCore.leave(session.sd, userId, now)
 	sync(session, now)
+end
+
+-- Walk-away leash: a player who stays farther than twice the join distance from the pet for
+-- LeashSeconds steps out, so nobody is held in a showdown they have walked away from.
+WildCore.LeashSeconds = 1.5
+function WildCore.leashDistance() return W.JoinDistance * 2 end
+
+-- The pure decision. farSince = when this player was first seen too far (nil = was close).
+-- distance = studs to the pet, or nil when it cannot be measured (no character): that counts as far.
+-- Returns the new farSince and whether the player should step out now.
+function WildCore.leashed(farSince, distance, now)
+	if type(distance) == "number" and distance == distance and distance <= WildCore.leashDistance() then
+		return nil, false
+	end
+	farSince = farSince or now
+	return farSince, now - farSince >= WildCore.LeashSeconds
+end
+
+-- Call every step for each player in the session. True = step this player out now.
+function WildCore.leash(session, userId, distance, now)
+	if session.state ~= "active" or not session.sd.players[userId] then
+		session.far[userId] = nil
+		return false
+	end
+	local since, out = WildCore.leashed(session.far[userId], distance, now)
+	session.far[userId] = since
+	return out
+end
+
+-- Is this player in the showdown right now (stepped in and not stepped out)?
+function WildCore.isIn(session, userId)
+	return session.state == "active" and session.sd.players[userId] ~= nil
 end
 
 -- The pet left. If the meter was not empty the pet just leaves: state "left", nothing is lost.

@@ -8,14 +8,25 @@ local Remotes = require(Shared.Net.Remotes)
 local WildView = require(Shared.Logic.WildView)
 local Ui = require(script.Parent.Ui)
 
--- asked[petId]: WildJoin was fired for this approach. done[petId]: its showdown ended.
+-- asked[petId]: when (os.clock) WildJoin was fired for this approach. done[petId]: its showdown ended.
 -- prompted[petId]: the join icon was shown once. shown: the pet whose ring is on screen. running: last news of a showdown we are not in.
 local WildShowdown = { asked = {}, done = {}, prompted = {}, shown = nil, running = nil }
 local CAMERA = "\240\159\147\183" -- camera emoji (U+1F4F7)
 
 -- Called by the Showdown controller.
-function WildShowdown.isIn(petId) return WildShowdown.asked[petId] == true and not WildShowdown.done[petId] end
+function WildShowdown.isIn(petId) return petId ~= nil and WildShowdown.shown == petId end
 function WildShowdown.showing(petId) WildShowdown.shown = petId end
+-- ring / icon / none for a wild ShowdownState (the server sends it to the whole floor).
+function WildShowdown.role(snap)
+	if snap.petId == nil then return "none" end
+	return WildView.snapshotRole(snap.mine, WildShowdown.asked[snap.petId] ~= nil, WildShowdown.done[snap.petId])
+end
+-- This player walked away (or the server says they are no longer in): the pet is still there, so it is
+-- NOT done. Forgetting the ask lets a walk back up join again.
+function WildShowdown.steppedOut(petId)
+	if petId == nil then return end
+	WildShowdown.asked[petId] = nil
+end
 function WildShowdown.seen(snap)
 	if snap.petId == nil or WildShowdown.done[snap.petId] then return end
 	WildShowdown.running = { petId = snap.petId, floor = snap.floor, rarity = snap.rarity, at = os.clock() }
@@ -120,13 +131,13 @@ function WildShowdown.init()
 
 		-- A pet may be asked again after the player has walked well away (or it is gone).
 		for id in pairs(WildShowdown.asked) do
-			if WildView.shouldForget(distance[id], WildShowdown.shown == id) then WildShowdown.asked[id] = nil end
+			if WildView.shouldForget(distance[id], WildShowdown.shown == id, os.clock() - WildShowdown.asked[id]) then WildShowdown.asked[id] = nil end
 		end
 
 		-- Auto-join: walk up and the ring opens.
 		local id = WildView.pickJoin(list, WildShowdown.asked, trying)
 		if id ~= nil then
-			WildShowdown.asked[id] = true
+			WildShowdown.asked[id] = os.clock()
 			join:FireServer(id)
 		end
 

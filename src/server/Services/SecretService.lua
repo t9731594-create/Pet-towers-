@@ -32,8 +32,8 @@ local function step(f, now)
 			local ok, pet = pcall(Pets.spawnOn, f, { rarity = S.Rarity, radiant = false, stay = stay, pillar = true })
 			if ok and pet then
 				st.visit = { at = p.at, leaves = p.leaves, petId = pet.id }
+				-- one banner only: Pets.spawnOn (pillar = true) has already sent the "pillar" banner to everyone
 				Net.all("SecretChime", chime(f, "here", p.at, p.leaves))
-				Net.all("Banner", { kind = "secret", floor = f })
 			else
 				warn("[PetTower] secret spawn on floor " .. f .. ": " .. tostring(pet))
 			end

@@ -80,10 +80,21 @@ function Showdown.init()
 		})
 	end
 	Remotes.get("ShowdownState").OnClientEvent:Connect(function(snap)
-		if snap.kind == "wild" and Showdown.pet ~= snap.petId then
-			-- A wild showdown this player has not stepped into: no ring, WildShowdown may show the join icon.
+		if snap.kind == "wild" then
+			-- The server sends this to everyone on the floor. Only a player the server says is in
+			-- (snap.mine) and who asked to join draws the ring; the rest may get the join icon.
 			local wild = wildController()
-			if wild and not wild.isIn(snap.petId) then wild.seen(snap) return end
+			local role = wild and wild.role(snap) or "none"
+			if role ~= "ring" then
+				if snap.petId ~= nil and Showdown.pet == snap.petId and snap.mine ~= true then
+					-- our ring is up but the server says we are not in (we stepped out): close it
+					if wild then wild.steppedOut(snap.petId) end
+					stop()
+				elseif role == "icon" then
+					wild.seen(snap)
+				end
+				return
+			end
 		end
 		local key = tostring(snap.kind) .. ":" .. tostring(snap.petId) .. ":" .. tostring(snap.start)
 		Showdown.seen = os.clock()
@@ -115,7 +126,12 @@ function Showdown.init()
 	Remotes.get("ShowdownEnd").OnClientEvent:Connect(function(result)
 		if result.kind == "wild" then
 			local wild = wildController()
-			if wild then wild.ended(result) end
+			if WildView.endMeans(result) == "stepped_out" then
+				-- we walked away: the pet is still there and can be joined again, so it is not marked done
+				if wild then wild.steppedOut(result.petId) end
+			elseif wild then
+				wild.ended(result)
+			end
 			if Showdown.pet ~= result.petId then return end -- not the ring on screen (e.g. a Guardian showdown)
 		end
 		-- stop() un-blocks Trust Tap, so after a wild win (the server clears NeedsPlay) the catch try can begin at once.

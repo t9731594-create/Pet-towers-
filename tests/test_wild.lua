@@ -363,4 +363,101 @@ function t.participants_sorted_and_counted_once()
 	T.eq(s.tookCount, 3)
 end
 
+-- Walk-away leash ------------------------------------------------------------
+function t.leash_distance_is_twice_the_join_distance()
+	T.eq(W.leashDistance(), E.Wild.JoinDistance * 2)
+	T.eq(W.leashDistance(), 40)
+	T.near(W.LeashSeconds, 1.5)
+end
+
+function t.leashed_pure_decision()
+	local far, close = W.leashDistance() + 0.1, W.leashDistance()
+	local since, out = W.leashed(nil, close, 10)
+	T.eq(since, nil) T.no(out) -- exactly at the leash is still close
+	since, out = W.leashed(nil, far, 10)
+	T.eq(since, 10) T.no(out) -- the timer starts, nobody steps out at once
+	since, out = W.leashed(since, far, 11.4)
+	T.eq(since, 10) T.no(out)
+	since, out = W.leashed(since, far, 11.5)
+	T.eq(since, 10) T.ok(out)
+	since, out = W.leashed(10, 5, 11.2) -- came back in time: the timer is forgotten
+	T.eq(since, nil) T.no(out)
+	since, out = W.leashed(nil, far, 20)
+	T.eq(since, 20) T.no(out) -- and starts afresh next time
+	-- a distance that cannot be measured (no character) counts as far, with the same patience
+	since, out = W.leashed(nil, nil, 30)
+	T.eq(since, 30) T.no(out)
+	since, out = W.leashed(since, nil, 31.5)
+	T.ok(out)
+	since, out = W.leashed(nil, 0 / 0, 40)
+	T.eq(since, 40) T.no(out)
+end
+
+function t.leash_steps_out_only_after_staying_far()
+	local s = W.new(pet(1, "Secret"), "Leaf", 0) -- 3000
+	T.ok(W.join(s, 1, 10, 0))
+	local now = 0
+	while now < 5 do -- standing next to the pet, checked 4 times a second
+		now = now + 0.25
+		T.no(W.leash(s, 1, 6, now))
+	end
+	T.no(W.leash(s, 1, 60, 5.25))
+	T.no(W.leash(s, 1, 60, 6))
+	T.no(W.leash(s, 1, 12, 6.25)) -- back near the pet: forgiven
+	T.no(W.leash(s, 1, 60, 6.5))
+	T.no(W.leash(s, 1, 60, 7.75))
+	T.ok(W.leash(s, 1, 60, 8))
+	T.ok(W.isIn(s, 1))
+	W.stepOut(s, 1, 8)
+	T.no(W.isIn(s, 1))
+	T.eq(s.far[1], nil)
+	T.near(s.sd.left, 3000 - 80, 1e-9) -- what was drained stays drained
+	T.eq(W.tick(s, 100), "active")
+	T.near(s.sd.left, 3000 - 80, 1e-9) -- and nothing more drains for them
+	T.no(W.leash(s, 1, 60, 100)) -- not in: the leash has nothing to do
+	T.eq(s.far[1], nil)
+end
+
+function t.walk_back_joins_again_with_a_fresh_leash()
+	local s = W.new(pet(1, "Legendary"), "Leaf", 0) -- 200
+	T.ok(W.join(s, 1, 10, 0))
+	T.no(W.leash(s, 1, 50, 1))
+	T.ok(W.leash(s, 1, 50, 2.5))
+	W.stepOut(s, 1, 2.5) -- 25 drained
+	T.ok(W.join(s, 1, 10, 10), "may step in again")
+	T.ok(W.isIn(s, 1))
+	T.eq(s.tookCount, 1)
+	T.no(W.leash(s, 1, 50, 10.25), "the old timer is gone")
+	T.no(W.leash(s, 1, 50, 11.5))
+	T.ok(W.leash(s, 1, 50, 11.75))
+	T.near(s.sd.left, 200 - 25, 1e-9) -- the leash itself never moves the meter (last tick was the join)
+	T.eq(W.tick(s, 27.5), "won") -- 175 left at power 10 from t = 10
+end
+
+function t.walked_away_player_keeps_the_try()
+	local s = W.new(pet(1, "Epic"), "Leaf", 0) -- 80
+	W.join(s, 1, 10, 0)
+	W.join(s, 2, 10, 0)
+	T.no(W.leash(s, 1, 99, 1))
+	T.ok(W.leash(s, 1, 99, 2.5))
+	W.stepOut(s, 1, 2.5) -- 50 drained by both
+	T.no(W.canTry(s, 1))
+	T.eq(W.tick(s, 5.5), "won") -- player 2 finishes alone
+	T.ok(W.canTry(s, 1), "walked away, still took part")
+	T.ok(W.canTry(s, 2))
+	T.no(W.leash(s, 2, 99, 6)) -- over: no leash
+	T.no(W.isIn(s, 2))
+end
+
+function t.leash_on_a_pet_that_left()
+	local s = W.new(pet(1, "Epic"), "Leaf", 0)
+	W.join(s, 1, 1, 0)
+	T.no(W.leash(s, 1, 99, 1))
+	W.leave(s, 2)
+	T.no(W.leash(s, 1, 99, 10))
+	T.eq(s.far[1], nil)
+	W.stepOut(s, 1, 10) -- harmless after the end
+	T.eq(s.state, "left")
+end
+
 return t

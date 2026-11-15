@@ -83,4 +83,74 @@ function t.capture()
 	T.no(V.captureAllowed({ IsContentSharingAllowed = "true" }))
 	T.no(V.captureAllowed({ IsContentSharingAllowed = true, IsSubjectToChinaPolicies = true }))
 end
+function t.forget_retries_an_ask_that_brought_no_ring()
+	T.no(V.shouldForget(10, false, 1))
+	T.no(V.shouldForget(10, false, V.RetrySeconds))
+	T.ok(V.shouldForget(10, false, V.RetrySeconds + 0.1))
+	T.no(V.shouldForget(10, true, 500), "ring on screen: the ask worked")
+	T.no(V.shouldForget(10, false, nil))
+end
+function t.snapshot_role()
+	-- the server sends the wild snapshot to the whole floor
+	T.eq(V.snapshotRole(true, true, false), "ring")
+	T.eq(V.snapshotRole(true, true, nil), "ring")
+	T.eq(V.snapshotRole(nil, false, nil), "icon", "bystander")
+	T.eq(V.snapshotRole(nil, true, nil), "icon", "asked but the server did not let us in: no ring")
+	T.eq(V.snapshotRole(false, true, nil), "icon")
+	T.eq(V.snapshotRole(true, false, nil), "none", "stepped out: a late copy never re-opens the ring")
+	T.eq(V.snapshotRole(true, true, true), "none", "over")
+	T.eq(V.snapshotRole(nil, false, true), "none", "over: no icon either")
+	T.eq(V.snapshotRole("yes", true, nil), "icon", "only a real true counts")
+	T.eq(V.snapshotRole(1, true, nil), "icon")
+end
+function t.only_ring_blocks_trust_tap()
+	-- Showdown.lua calls begin() (which blocks Trust Tap) only for "ring"
+	local rings = 0
+	for _, mine in ipairs({ true, false }) do
+		for _, asked in ipairs({ true, false }) do
+			for _, done in ipairs({ true, false }) do
+				if V.snapshotRole(mine, asked, done) == "ring" then
+					rings = rings + 1
+					T.ok(mine and asked and not done)
+				end
+			end
+		end
+	end
+	T.eq(rings, 1)
+end
+function t.end_means()
+	T.eq(V.endMeans({ kind = "wild", petId = 1, floor = 1, won = false, left = true }), "stepped_out")
+	T.eq(V.endMeans({ kind = "wild", petId = 1, floor = 1, won = false }), "pet_left")
+	T.eq(V.endMeans({ kind = "wild", petId = 1, floor = 1, won = true }), "won")
+	T.eq(V.endMeans({ won = false, left = 12 }), "pet_left", "the old `left` number is not a walk-away")
+	T.eq(V.endMeans(nil), "pet_left")
+end
+function t.secret_banner_only_when_no_pillar_banner()
+	T.ok(V.secretBanner(nil), "arrived mid-visit: no pillar banner came")
+	T.no(V.secretBanner(0))
+	T.no(V.secretBanner(1.2))
+	T.no(V.secretBanner(V.PillarBannerSeconds))
+	T.ok(V.secretBanner(V.PillarBannerSeconds + 1), "an old banner from an earlier visit")
+	T.ok(V.secretBanner(-1))
+end
+function t.glow_at()
+	local p, s = V.glowAt("glow", 1000, 1180, 940, 60)
+	T.near(p, 0) T.near(s, 60)
+	p, s = V.glowAt("glow", 1000, 1180, 985, 60) -- lantern loaded 45 s into the glow
+	T.near(p, 0.75) T.near(s, 15)
+	p, s = V.glowAt("glow", 1000, 1180, 900, 60) -- clock a little off: never below 0
+	T.near(p, 0) T.near(s, 60)
+	p, s = V.glowAt("glow", 1000, 1180, 1010, 60) -- the chime has rung, "here" not heard yet
+	T.near(p, 1) T.near(s, 0)
+	p, s = V.glowAt("here", 1000, 1180, 1100, 60)
+	T.near(p, 1) T.near(s, 0)
+	p, s = V.glowAt("here", 1000, 1180, 1180 + V.ChimeForgetSeconds, 60) -- a kept pet may stay a little
+	T.near(p, 1)
+	T.eq(V.glowAt("here", 1000, 1180, 1181 + V.ChimeForgetSeconds, 60), nil, "long over, no gone heard")
+	T.eq(V.glowAt("glow", 1000, 1180, 1181 + V.ChimeForgetSeconds, 60), nil)
+	T.eq(V.glowAt("gone", 1000, 1180, 1100, 60), nil)
+	T.eq(V.glowAt("glow", nil, nil, 1100, 60), nil)
+	p = V.glowAt("here", nil, nil, 1100, 60)
+	T.near(p, 1)
+end
 return t
