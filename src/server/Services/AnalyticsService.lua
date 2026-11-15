@@ -1,5 +1,5 @@
 -- Funnel steps and every coin source and sink (bible C3). Calls are wrapped: analytics must never
--- break play. The exact AnalyticsService signatures still need checking against current docs.
+-- break play. Signatures checked against the Creator docs source on 2026-11-15; events only log in a published game.
 local Players = game:GetService("Players")
 local RobloxAnalytics = game:GetService("AnalyticsService")
 local Profile = require(script.Parent.Parent.Core.Profile)
@@ -26,7 +26,8 @@ function Analytics.init()
 		if not player then return end
 		pcall(function()
 			local flow = kind == "source" and Enum.AnalyticsEconomyFlowType.Source or Enum.AnalyticsEconomyFlowType.Sink
-			RobloxAnalytics:LogEconomyEvent(player, flow, "Coins", amount, profile.coins, name)
+			-- (player, flowType, currencyType, amount, endingBalance, transactionType, itemSku)
+			RobloxAnalytics:LogEconomyEvent(player, flow, "Coins", amount, profile.coins, Enum.AnalyticsEconomyTransactionType.Gameplay.Name, name)
 		end)
 	end
 	Data.onLoaded(function(player, profile)

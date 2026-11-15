@@ -14,6 +14,7 @@ function Floors.go(player, profile, floor)
 	if floor == 0 then
 		local camp = World.campOf(player)
 		if not camp then return end
+		pcall(function() player:RequestStreamAroundAsync(camp.spawn.Position, 5) end)
 		ch:PivotTo(camp.spawn)
 		player:SetAttribute("Floor", 0)
 		Data.setExtra(player, "floor", 0)
@@ -23,6 +24,7 @@ function Floors.go(player, profile, floor)
 	end
 	if floor > World.BuiltFloors or not Profile.canEnter(profile, floor) then return end
 	if profile.tutorial < 1 then return end -- first make a friend at camp
+	pcall(function() player:RequestStreamAroundAsync(World.floors[floor].spawn.Position, 5) end)
 	ch:PivotTo(World.floors[floor].spawn)
 	player:SetAttribute("Floor", floor)
 	Data.setExtra(player, "floor", floor)

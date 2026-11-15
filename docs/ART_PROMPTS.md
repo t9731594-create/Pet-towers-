@@ -1,0 +1,48 @@
+# Model prompts (bible B10)
+
+Nothing has been generated. Paid generation needs the owner's approval (hard rule 4), and the Game Asset
+Library must be checked for reuse first. Each model: 5,000 triangles or fewer, 512 px textures, symmetrical.
+
+Order of work: style sheet first (3 starters, Floor 1 pets, HUD) for approval, then batches by floor.
+
+Starters also need stage 2 and stage 3 models (same creature, older and grander) and Dawn / Dusk palettes on the stage 3 mesh.
+
+- **Pandle** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a red panda whose tail is a candle flame; friendly, never scary.
+- **Narbub** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a narwhal calf floating in a bubble; friendly, never scary.
+- **Capling** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a capybara with a small sprout on its head; friendly, never scary.
+- **Buttercub** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a bear cub with a buttercup hat; friendly, never scary.
+- **Hopscotch** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a hare with checkered ears; friendly, never scary.
+- **Zipwing** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a dragonfly with stained-glass wings; friendly, never scary.
+- **Marigoat** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a goat kid with a marigold mane; friendly, never scary.
+- **Sunflion** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a lion cub with a sunflower mane; friendly, never scary.
+- **Shellby** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a hermit crab in a teacup; friendly, never scary.
+- **Pufferpop** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a balloon pufferfish; friendly, never scary.
+- **Coralope** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a fawn with sea-fern antlers; friendly, never scary.
+- **Flaremingo** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a flamingo with sunset feathers; friendly, never scary.
+- **Sunsetter** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a setter pup with a sunset coat; friendly, never scary.
+- **Capkin** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a mouse under a mushroom cap; friendly, never scary.
+- **Glowl** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a owlet with glowing ring eyes; friendly, never scary.
+- **Lumoth** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a moth with lantern wings; friendly, never scary.
+- **Fungiraffe** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a giraffe calf with mushroom horns; friendly, never scary.
+- **Wispwolf** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a wolf pup of soft blue mist; friendly, never scary.
+- **Flurrypup** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a snowball puppy; friendly, never scary.
+- **Chillama** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a llama with icicle wool; friendly, never scary.
+- **Belluga** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a beluga calf with a bell tail; friendly, never scary.
+- **Auroram** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a ram with aurora horns; friendly, never scary.
+- **Mammint** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a mint-green baby mammoth with candy-cane tusks; friendly, never scary.
+- **Cometkit** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a kitten with a comet tail; friendly, never scary.
+- **Saturtle** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a turtle with a ringed-planet shell; friendly, never scary.
+- **Nebulray** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a ray with star freckles; friendly, never scary.
+- **Meteorhino** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a rhino calf with a glowing horn; friendly, never scary.
+- **Haloheron** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a heron with a gold-and-violet halo; friendly, never scary.
+- **Lanternlamb** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a lamb whose wool glows like a paper lantern; friendly, never scary.  _Secret, name pending approval_
+- **Pearlotter** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a otter cradling a glowing pearl; friendly, never scary.  _Secret, name pending approval_
+- **Flickerfox** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a fox kit with a will-o'-wisp tail; friendly, never scary.  _Secret, name pending approval_
+- **Chimecub** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a polar bear cub wearing a frozen bell; friendly, never scary.  _Secret, name pending approval_
+- **Novanewt** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a newt with a tiny star on its tail; friendly, never scary.  _Secret, name pending approval_
+- **Old Bramblehorn** (Leaf): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (grass green, yellow and tan), matte, symmetrical, neutral pose; a sleepy ox overgrown with hedges; friendly, never scary.  _Guardian, 25-40 studs_
+- **Clatterclaw** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a hermit crab wearing a lighthouse; friendly, never scary.  _Guardian_
+- **Grumblecap** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a toad under a glowing lantern mushroom; friendly, never scary.  _Guardian_
+- **Brrnard** (Tide): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (sky blue, teal and white), matte, symmetrical, neutral pose; a mountain dog the size of a cabin who lost his bell; friendly, never scary.  _Guardian_
+- **Starsnore** (Ember): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (warm red, orange and cream), matte, symmetrical, neutral pose; a sky whale snoring constellations; friendly, never scary.  _Guardian_
+- **Honk the Clockwork Goose** (-): stylized cartoon toy, chunky low-poly, big head, large simple eyes, 2-3 flat colours (brass, cream and teal), matte, symmetrical, neutral pose; a clockwork goose; friendly, never scary.  _Weekly Guardian_

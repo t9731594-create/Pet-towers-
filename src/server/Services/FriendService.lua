@@ -6,10 +6,7 @@ local Friends = { pairs = {} } -- "low:high" -> true
 local function key(a, b) if a > b then a, b = b, a end return a .. ":" .. b end
 
 local function check(player, other)
-	local ok, are = pcall(function()
-		if player.IsFriendsWithAsync then return player:IsFriendsWithAsync(other.UserId) end
-		return player:IsFriendsWith(other.UserId)
-	end)
+	local ok, are = pcall(function() return player:IsFriendsWithAsync(other.UserId) end)
 	Friends.pairs[key(player.UserId, other.UserId)] = (ok and are) or nil
 end
 

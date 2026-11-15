@@ -40,7 +40,7 @@ function DataCore:_retry(fn)
 		local ok, a, b = pcall(fn)
 		if ok then return true, a, b end
 		lastErr = a
-		self.sleep(attempt * 2)
+		self.sleep(math.min(attempt, 3)) -- 12 s in all: must fit inside the 30 s shutdown window
 	end
 	return false, lastErr
 end

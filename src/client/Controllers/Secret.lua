@@ -17,9 +17,10 @@ local SPARKLES_FULL = 14 -- particles per second at full glow
 local Secret = { glows = {} } -- glows[floor] = { key, light, halo, sparkles, tweens }
 
 local function lanternOf(floor)
-	local world = workspace:WaitForChild("PetTowerWorld", 10)
-	local folder = world and world:WaitForChild("Floor" .. floor, 10)
-	local lantern = folder and folder:WaitForChild("Lantern", 10)
+	-- no waiting: with streaming on, a far floor's lantern is simply not loaded yet
+	local world = workspace:FindFirstChild("PetTowerWorld")
+	local folder = world and world:FindFirstChild("Floor" .. floor)
+	local lantern = folder and folder:FindFirstChild("Lantern")
 	if lantern and lantern:IsA("BasePart") then return lantern end
 end
 

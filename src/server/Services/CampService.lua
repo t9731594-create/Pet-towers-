@@ -172,7 +172,10 @@ function Camp.init()
 			local hrp = ch:WaitForChild("HumanoidRootPart", 10)
 			if not hrp then return end
 			task.wait()
-			if camp then ch:PivotTo(camp.spawn) end
+			if camp then
+				pcall(function() player:RequestStreamAroundAsync(camp.spawn.Position, 5) end)
+				ch:PivotTo(camp.spawn)
+			end
 			player:SetAttribute("Floor", 0)
 			Camp.refreshStarter(player, profile)
 			Pets.refreshStack(player, profile)
