@@ -27,7 +27,9 @@ function Profile.new(now)
 		index = {}, -- species -> true (caught) ; seen -> "seen"
 		journeyDay = 1,
 		lastSeen = now, firstJoin = now,
-		egg = false, weekly = {}, purchases = {}, codes = {},
+		egg = false, eggDay = 0, weekly = {}, purchases = {}, codes = {},
+		passes = {}, looks = {}, -- pass key -> true ; look id -> true
+		restedUntil = 0, lastPlayDay = 0, helperStars = 0,
 		settings = { music = 1, effects = 1, lowGraphics = false, tapAssist = false, reducedFlash = false },
 		tutorial = 0,
 		assist = { misses = 0, catchesLeft = 0 },
@@ -38,18 +40,24 @@ function Profile.new(now)
 	return p
 end
 
+-- Listeners for analytics (set by the Analytics service; nil in tests).
+Profile.onCoins = nil -- fn(p, amount, "source" | "sink", name)
+Profile.onFunnel = nil -- fn(p, step)
+
 -- Coins (every source and sink is logged, bible C3) -------------------------
 function Profile.addCoins(p, n, source)
 	n = math.floor(n)
 	if n <= 0 then return 0 end
 	p.coins = p.coins + n
 	p.stats.sources[source] = (p.stats.sources[source] or 0) + n
+	if Profile.onCoins then Profile.onCoins(p, n, "source", source) end
 	return n
 end
 function Profile.spend(p, n, sink)
 	if p.coins < n then return false, "coins" end
 	p.coins = p.coins - n
 	p.stats.sinks[sink] = (p.stats.sinks[sink] or 0) + n
+	if Profile.onCoins then Profile.onCoins(p, n, "sink", sink) end
 	return true
 end
 
@@ -71,7 +79,9 @@ function Profile.where(p, id)
 	if indexOf(p.spare, id) then return "spare" end
 end
 function Profile.stackCap(p)
-	return math.min(E.Stack.Start + p.upgrades.stack, E.Stack.Start + #E.Stack.Prices)
+	local cap = math.min(E.Stack.Start + p.upgrades.stack, E.Stack.Start + #E.Stack.Prices)
+	if p.passes and p.passes.BiggerStack then cap = cap + E.Passes.BiggerStack end
+	return cap
 end
 function Profile.stackFull(p) return #p.stack >= Profile.stackCap(p) end
 function Profile.unlockedFloor(p) return math.min(p.cleared + 1, Config.Floors.Count) end
@@ -280,6 +290,71 @@ function Profile.buyStack(p)
 	return true, Profile.stackCap(p)
 end
 
+-- Index -------------------------------------------------------------------
+-- Caught count for the Index Board ("5/28"): the starter counts as one; Secrets count once found.
+function Profile.indexCount(p)
+	local n, total = p.starter and 1 or 0, E.IndexTotal
+	for species in pairs(p.index) do
+		local def = P.Wild[species]
+		if def then
+			n = n + 1
+			if def.rarity == "Secret" then total = total + 1 end
+		end
+	end
+	return n, total
+end
+-- Floors whose five pets are all caught (each gives +5% coins forever).
+function Profile.indexSets(p)
+	local sets = 0
+	for floor = 1, Config.Floors.Count do
+		local all = true
+		for _, rarity in ipairs(E.Rarities) do
+			if not p.index[P.ByFloor[floor][rarity]] then all = false break end
+		end
+		if all then sets = sets + 1 end
+	end
+	return sets
+end
+
+-- Share or Keep, Dawn or Dusk ------------------------------------------------
+function Profile.pendingChoice(p)
+	for floor = 1, Config.Floors.Count do
+		local f = p.floors[tostring(floor)]
+		if f and f.cleared and f.choice == false then return floor end
+	end
+end
+-- Returns ok, { selfSeconds, everyoneSeconds } : seconds of each receiver's OWN income.
+function Profile.choose(p, floor, choice)
+	local f = p.floors[tostring(floor)]
+	if not f or not f.cleared or f.choice ~= false then return false, "no_choice" end
+	if choice == "share" then
+		f.choice = "share"
+		p.dawn = p.dawn + 1
+		return true, { selfSeconds = 0, everyoneSeconds = E.Choice.ShareSeconds }
+	elseif choice == "keep" then
+		f.choice = "keep"
+		p.dusk = p.dusk + 1
+		return true, { selfSeconds = E.Choice.KeepSeconds, everyoneSeconds = 0 }
+	end
+	return false, "bad_choice"
+end
+-- Coins for `seconds` of this player's own income (never less than a small floor-based amount).
+function Profile.grantIncome(p, seconds, source, mult)
+	local rate = math.max(Profile.incomePerSecond(p), E.Choice.MinIncome * E.CommonIncome[Profile.unlockedFloor(p)])
+	return Profile.addCoins(p, rate * seconds * (mult or 1), source)
+end
+function Profile.side(p)
+	if p.dawn > p.dusk then return "dawn" elseif p.dusk > p.dawn then return "dusk" end
+end
+-- At Lv 42 the starter takes a Dawn or Dusk form of the player's choosing (once).
+function Profile.chooseForm(p, form)
+	if not p.starter or p.starter.form then return false, "no_choice" end
+	if F.starterStage(p.starter.level) < 4 then return false, "too_early" end
+	if form ~= "dawn" and form ~= "dusk" then return false, "bad_form" end
+	p.starter.form = form
+	return true
+end
+
 -- Floors --------------------------------------------------------------------
 function Profile.canEnter(p, floor)
 	return floor >= 1 and floor <= Profile.unlockedFloor(p) and p.starter ~= nil
@@ -296,6 +371,7 @@ end
 function Profile.funnel(p, step, now)
 	if p.stats.funnel[step] then return false end
 	p.stats.funnel[step] = now - p.firstJoin
+	if Profile.onFunnel then Profile.onFunnel(p, step) end
 	return true
 end
 

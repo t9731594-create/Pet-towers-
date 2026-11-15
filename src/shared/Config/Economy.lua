@@ -100,6 +100,31 @@ Economy.Secret = {
 	GlowSeconds = 60, -- the lantern glow builds for this long before the pet appears
 }
 
+-- Reasons to come back (bible B7). Warm, never urgent: nothing here is lost by missing a day.
+Economy.Return = {
+	ChestRate = 0.25, -- pets earn at 25% speed while you are away
+	ChestHours = 4, ChestHoursLantern = 8,
+	ChestMinAwaySeconds = 300,
+	RestedAfterHours = 8, RestedMinutes = 10, RestedMult = 2,
+	EggHatchHours = 8,
+	-- Journey ladder: never resets. Gift = minutes of your own income (at least MinCoins x day).
+	LadderMinutes = { 5, 6, 7, 8, 9, 10, 15 }, -- day 1..7, then repeats from 10
+	LadderMinCoins = 100,
+	LadderLooks = { [3] = "aura_spark", [7] = "trail_lantern", [14] = "camp_bunting", [28] = "lift_gold" }, -- looks only
+}
+
+-- Share or Keep (bible B7).
+Economy.Choice = { ShareSeconds = 300, KeepSeconds = 600, MinIncome = 1 }
+
+-- Index sets: all 5 pets of a floor = +5% coins forever.
+Economy.IndexSetBonus = 0.05
+Economy.IndexTotal = 28 -- 3 starters + 25 wild; Secret pets show only once found
+
+-- What the passes do (prices are in Config/Shop and need approval). Untested sizes.
+Economy.Passes = { DoubleCoinsMult = 2, BiggerStack = 2, CampPads = 8, AutoCollectSeconds = 5 }
+Economy.ShopButtonAfterSeconds = 300 -- nothing is sold in the first 5 minutes
+Economy.CodeMaxSeconds = 600 -- a code gives a look or at most 10 minutes of income
+
 -- Natures: key beats value.
 Economy.NatureBeats = { Ember = "Leaf", Leaf = "Tide", Tide = "Ember" }
 

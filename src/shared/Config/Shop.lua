@@ -9,4 +9,8 @@ Shop.Passes = {
 	{ key = "AutoCollect", robux = 199 },
 }
 Shop.CoinPacks = { { seconds = 1800, robux = 49 }, { seconds = 7200, robux = 149 }, { seconds = 28800, robux = 399 } }
+-- Roblox product / pass ids are filled in after the items are created in Creator Hub (needs approval).
+Shop.PassIds = {} -- key -> game pass id
+Shop.ProductCatalog = {} -- developer product id -> { kind = "coins", seconds = n } | { kind = "look", look = id }
+Shop.Looks = {} -- { key, robux } cosmetics sold directly
 return Shop
