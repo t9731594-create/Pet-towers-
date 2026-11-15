@@ -56,7 +56,16 @@ local function finish(f, sd)
 				first = Profile.clearFloor(profile, f)
 				if first and f == 1 then Profile.funnel(profile, "FirstGuardianWin", os.time()) end
 				if #ids >= 2 then Profile.funnel(profile, "FirstCoopShowdown", os.time()) end
-				if not first then profile.stats.helps = (profile.stats.helps or 0) + 1 end
+				if not first then
+					-- helping on a floor you have cleared: a Helper star and a small reward once a day
+					profile.stats.helps = (profile.stats.helps or 0) + 1
+					profile.helperStars = (profile.helperStars or 0) + 1
+					local today = math.floor(os.time() / 86400)
+					if profile.weekly.helpDay ~= today then
+						profile.weekly.helpDay = today
+						Net.send(player, "Coins", Profile.grantIncome(profile, 60, "helper"), "helper")
+					end
+				end
 			else
 				Showdown.lostAt[player] = Net.now()
 			end

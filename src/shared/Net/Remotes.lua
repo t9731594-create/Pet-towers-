@@ -19,6 +19,11 @@ Remotes.C2S = {
 	Cheer = { rate = 4, burst = 6 }, -- (offset seconds since the showdown's start)
 	CallHelp = { rate = 0.1, burst = 1 }, -- ()
 	WildJoin = { rate = 1, burst = 3 }, -- (petId)  Amendment 1: step in to play with an Epic+ pet
+	Choose = { rate = 1, burst = 2 }, -- (floor, "share" | "keep")
+	ChooseForm = { rate = 1, burst = 2 }, -- ("dawn" | "dusk")  at starter Lv 42
+	HatchEgg = { rate = 1, burst = 2 }, -- ()
+	Emote = { rate = 0.5, burst = 3 }, -- (index 1..6)
+	RedeemCode = { rate = 0.2, burst = 2 }, -- (code string, 24 characters at most)
 }
 
 -- Server -> client.
@@ -37,6 +42,11 @@ Remotes.S2C = {
 	-- kind = "wild" and two extra fields: petId, rarity. ShowdownEnd for kind "wild" carries
 	-- { kind, petId, won = true (meter empty: you may now try) | false (the pet left) }.
 	"SecretChime", -- ({ floor, phase = "glow" | "here" | "gone", at, leaves })  times are UTC seconds
+	"Welcome", -- ({ away, chest, rested, newDay, journeyDay, ladderCoins, look, tomorrow = { minutes, look }, egg = { state, readyAt } })
+	"ChoicePrompt", -- (floor)  show the two big Share / Keep buttons
+	"Shared", -- ({ userId, name, coins })  "<name> shared!"  (keeping is never announced)
+	"EggHatched", -- ({ species, rarity, radiant })
+	"Emote", -- (userId, index)
 	"ClipMoment", -- ({ kind = "wild_legendary" | "secret" | ..., floor })  offer a capture where allowed
 }
 

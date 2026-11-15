@@ -81,6 +81,15 @@ local function save(player, release)
 	if not ok then warn("[PetTower] save failed for " .. player.UserId .. ": " .. tostring(why)) end
 end
 
+-- Save right now and report success (used before answering a purchase receipt).
+function Data.saveNow(player)
+	local p = Data.profiles[player]
+	if not p then return false end
+	p.lastSeen = os.time()
+	local ok = core:save(key(player), p, false)
+	return ok
+end
+
 function Data.init()
 	local store
 	local ok = pcall(function() store = realStore() store:update("__probe", function() return nil end) end)

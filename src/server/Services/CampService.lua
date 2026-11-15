@@ -8,7 +8,7 @@ local Net = require(script.Parent.Net)
 local Data = require(script.Parent.DataService)
 local World = require(script.Parent.WorldService)
 local Pets = require(script.Parent.PetService)
-local Friends = require(script.Parent.FriendService)
+local CoinMult = require(script.Parent.CoinMult)
 
 local Camp = {}
 
@@ -71,7 +71,7 @@ local function chooseStarter(player, profile, species)
 end
 
 local function collect(player, profile)
-	local _, got = Profile.collect(profile, os.time(), Friends.coinMult(player))
+	local _, got = Profile.collect(profile, os.time(), CoinMult(player, profile))
 	if got > 0 then Net.send(player, "Coins", got, "pads") Data.push(player) end
 end
 
@@ -91,6 +91,7 @@ local function feed(player, profile)
 	if not ok then return end
 	if r.evolvedTo then
 		if r.evolvedTo == 2 then Profile.funnel(profile, "FirstEvolution", os.time()) end
+		if r.evolvedTo == 3 then Profile.funnel(profile, "Lv25Evolution", os.time()) end
 		Camp.refreshStarter(player, profile)
 		Net.send(player, "Evolve", { species = profile.starter.species, stage = r.evolvedTo })
 	end
@@ -155,12 +156,12 @@ function Camp.init()
 		if (a == nil or type(a) == "number") and (b == nil or type(b) == "number") and Profile.setTeam(profile, a, b) then Data.push(player) end
 	end)
 	Net.on("Place", Data, function(player, profile, id, pad)
-		if type(id) == "number" and type(pad) == "number" and Profile.place(profile, id, pad, os.time(), Friends.coinMult(player)) then
+		if type(id) == "number" and type(pad) == "number" and Profile.place(profile, id, pad, os.time(), CoinMult(player, profile)) then
 			Camp.refresh(player, profile) Data.push(player)
 		end
 	end)
 	Net.on("Release", Data, function(player, profile, id)
-		if type(id) == "number" and Profile.release(profile, id, os.time(), Friends.coinMult(player)) then
+		if type(id) == "number" and Profile.release(profile, id, os.time(), CoinMult(player, profile)) then
 			Camp.refresh(player, profile) Data.push(player)
 		end
 	end)

@@ -1,7 +1,7 @@
 -- Greybox world built by code: hub, 7 camps, floors. Art replaces these parts later (M7); the names,
 -- attributes and positions are what other services rely on.
 local Config = require(game:GetService("ReplicatedStorage").Shared.Config)
-local World = { camps = {}, floors = {}, BuiltFloors = 3 }
+local World = { camps = {}, floors = {}, BuiltFloors = 5 }
 
 local RARITY_COLOR = {
 	Common = Color3.fromRGB(170, 170, 170), Uncommon = Color3.fromRGB(90, 200, 90), Rare = Color3.fromRGB(70, 140, 255),
@@ -71,6 +71,8 @@ local function buildCamp(i, root)
 	station("SnackTable", -22, 6, Color3.fromRGB(255, 170, 120), "Feed")
 	station("CharmBench", -22, 16, Color3.fromRGB(190, 150, 255), "Charm")
 	station("Lift", 22, 6, Color3.fromRGB(255, 240, 180), "Lift")
+	station("EggNest", 22, 16, Color3.fromRGB(255, 250, 235), "Egg")
+	station("Mailbox", 22, 26, Color3.fromRGB(150, 200, 255), "Mail")
 	return camp
 end
 

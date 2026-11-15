@@ -10,7 +10,7 @@ require(Services.CampService).init()
 require(Services.FloorService).init()
 require(Services.ShowdownService).init()
 -- optional services added by later features
-for _, name in ipairs({ "WildShowdownService", "SecretService" }) do
+for _, name in ipairs({ "WildShowdownService", "SecretService", "ReturnService", "ChoiceService", "ShopService", "AnalyticsService", "EmoteService" }) do
 	local module = Services:FindFirstChild(name)
 	if module then require(module).init() end
 end
