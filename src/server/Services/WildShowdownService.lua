@@ -128,9 +128,9 @@ local function step(now)
 			local state = WildCore.tick(s, now)
 			if s.sd.count > 0 then
 				local snap = snapshot(entry)
-				for id in pairs(s.sd.players) do
-					local player = Players:GetPlayerByUserId(id)
-					if player then Net.send(player, "ShowdownState", snap) end
+				-- everyone on the floor hears about it: participants draw the ring, the rest get the join icon
+				for _, player in ipairs(Players:GetPlayers()) do
+					if Pets.floorOf(player) == entry.pet.floor then Net.send(player, "ShowdownState", snap) end
 				end
 			end
 			if state == "won" then playedOut(entry) end

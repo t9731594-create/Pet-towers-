@@ -1,13 +1,18 @@
 # Status
 
-**Milestone:** M0-M3 source written, headless-tested only. Amendment 1 in progress on branches.
+**Milestone:** M0-M3 source and Amendment 1 written and merged into `dev`, headless-tested only. Waiting for the owner's OK before `dev` goes into `main`, and for the Mac for every Studio test.
 **Owner account:** FantasyGaming (@Talleyrandw).
-**Where this lives:** a cloud container, local git only (`main` = M0, `dev` = current). Not yet on the SanDisk.
+**Where this lives:** github.com/t9731594-create/Pet-towers- (`main` = M0, `dev` = current, plus the five Amendment 1 branches). Not yet on the SanDisk.
 
 ## Done
 - M0 (source half): bible saved, config modules, headless harness, tools/econ_sim.
 - M1-M3 (source only): core rules with tests (profile, Trust Tap, spawns, stack, camp, levels, team,
   natures, showdown, saving with session lock, rate limit); Roblox services and a greybox client.
+
+## Amendment 1 (merged into dev in order: docs, server, client, secret pets, sim)
+- After the last merge: check_lua 52 files, 0 syntax errors; tests 110 passed, 0 failed.
+- Branch notes: docs/branches/. Pacing output: docs/branches/tools-sim-wild-showdown-output.txt.
+- NOT done: the 3-client Studio test (Epic alone, Legendary with 2, Secret with 3).
 
 ## Real numbers
 - `python3 tools/lua.py tests/run.lua`: see the last line of the latest run in the branch notes.
