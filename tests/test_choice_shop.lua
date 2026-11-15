@@ -87,6 +87,18 @@ function t.codes_once_and_capped()
 	T.no(ShopCore.redeemCode(p, 12345, codes))
 	T.ok(ShopCore.redeemCode(p, "glow", codes)) T.ok(p.looks.aura_code)
 end
+function t.closet_wear_only_what_you_own()
+	local p = player()
+	local ok, why = Profile.equip(p, "aura_spark")
+	T.no(ok) T.eq(why, "not_owned")
+	p.looks.aura_spark = true p.looks.decor_kite = true p.looks.weekly_3 = true
+	T.ok(Profile.equip(p, "aura_spark")) T.eq(p.equipped.aura, "aura_spark")
+	T.ok(Profile.equip(p, "weekly_3")) T.eq(p.equipped.aura, "weekly_3") -- same slot: replaces
+	T.ok(Profile.equip(p, "decor_kite")) T.eq(p.equipped.camp, "decor_kite")
+	T.no(Profile.equip(p, "hacked")) T.no(Profile.equip(p, 42))
+	T.ok(Profile.equip(p, "", "aura")) T.eq(p.equipped.aura, nil)
+	T.no(Profile.equip(p, "", "aura"))
+end
 function t.nothing_for_sale_is_random()
 	T.eq(#ShopCore.audit(Config.Shop), 0)
 	T.eq(#ShopCore.audit({ Passes = { { key = "LuckBoost" }, { key = "MysteryEggPack" } } }), 2)

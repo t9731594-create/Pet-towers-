@@ -28,6 +28,8 @@ Remotes.C2S = {
 	ChooseWeekly = { rate = 1, burst = 2 }, -- ("share" | "keep")  after a Weekly Guardian win
 	SetSetting = { rate = 2, burst = 6 }, -- (key, value)
 	IndexOpen = { rate = 1, burst = 2 }, -- ()
+	Equip = { rate = 2, burst = 6 }, -- (look id, or "" with a slot name to take it off)
+	MailOpen = { rate = 1, burst = 2 }, -- ()
 	Debug = { rate = 5, burst = 10 }, -- (command, argument)  Studio only: ignored in a live game
 }
 
@@ -57,6 +59,8 @@ Remotes.S2C = {
 	"Week", -- ({ week, guardian, merchantOpen, items = { { slot, kind, id, price, bought } }, tally = { dawn, dusk }, lastLeader, trim, monument = { [floor] = { names } } })
 	"WeeklyChoice", -- ()  show the Share / Keep buttons after a Weekly Guardian win
 	"Index", -- (IndexView rows)
+	"Mail", -- ({ journeyDay, tomorrow = { minutes, look }, egg = { state, readyAt }, codes = bool })
+	"Closet", -- ({ looks = { id, ... }, equipped = { slot = id } })
 	"ClipMoment", -- ({ kind = "wild_legendary" | "secret" | ..., floor })  offer a capture where allowed
 }
 

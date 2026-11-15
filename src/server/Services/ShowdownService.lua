@@ -78,6 +78,12 @@ local function finish(f, sd)
 		end
 	end
 	if won then Net.all("Banner", { kind = "relit", floor = f }) end
+	if won and #ids >= 7 then
+		for _, id in ipairs(ids) do
+			local player = playerById(id)
+			if player then Net.send(player, "ClipMoment", { kind = "guardian7", floor = f }) end
+		end
+	end
 end
 
 function Showdown.init()

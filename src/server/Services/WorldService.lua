@@ -74,6 +74,7 @@ local function buildCamp(i, root)
 	station("EggNest", 22, 16, Color3.fromRGB(255, 250, 235), "Egg")
 	station("Mailbox", 22, 26, Color3.fromRGB(150, 200, 255), "Mail")
 	station("IndexBoard", -22, 26, Color3.fromRGB(210, 190, 140), "Index")
+	station("Closet", 32, 6, Color3.fromRGB(255, 190, 230), "Looks")
 	station("PadPost", -32, 6, Color3.fromRGB(250, 235, 150), "Pads")
 	station("StackHook", -32, 16, Color3.fromRGB(180, 230, 255), "Stack")
 	-- Tower Trophy: one block per floor, lit gold (shared) or violet (kept) once cleared
@@ -88,7 +89,7 @@ local function buildFloor(f, root)
 	local center = Vector3.new(0, 400 * f, 0)
 	local folder = Instance.new("Folder") folder.Name = "Floor" .. f folder.Parent = root
 	local floor = { index = f, center = center, folder = folder, size = 220 }
-	floor.ground = part({ Name = "Ground", Size = Vector3.new(220, 2, 220), Position = center, Color = FLOOR_COLOR[f]:Lerp(Color3.new(0.5, 0.5, 0.5), 0.6) }, folder)
+	floor.ground = part({ Name = "Ground", Size = Vector3.new(220, 2, 220), Position = center, Color = FLOOR_COLOR[f] }, folder)
 	floor.fullColor = FLOOR_COLOR[f]
 	floor.spawn = CFrame.new(center + Vector3.new(0, 4, 90))
 	floor.lift = part({ Name = "Lift", Size = Vector3.new(10, 1, 10), Position = center + Vector3.new(0, 1.5, 100), Color = Color3.fromRGB(255, 240, 180) }, folder)
@@ -157,7 +158,6 @@ World.RaritySize = { Common = 2, Uncommon = 2.5, Rare = 3, Epic = 3.5, Legendary
 function World.relight(f)
 	local floor = World.floors[f]
 	if not floor then return end
-	floor.ground.Color = floor.fullColor
 	floor.lantern.Color = Color3.fromRGB(255, 220, 120)
 	floor.guardian.Color = Color3.fromRGB(255, 235, 170)
 end

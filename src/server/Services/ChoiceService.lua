@@ -39,6 +39,7 @@ function Choice.init()
 		if Profile.chooseForm(profile, form) then
 			Camp.refreshStarter(player, profile)
 			Net.send(player, "Evolve", { species = profile.starter.species, stage = 4, form = form })
+			Net.send(player, "ClipMoment", { kind = "dawn_dusk", floor = 0 })
 			Data.push(player)
 		end
 	end)

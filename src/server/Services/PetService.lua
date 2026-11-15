@@ -131,6 +131,12 @@ local function finish(player)
 		end
 	end
 	result.species, result.rarity, result.radiant = pet.species, pet.rarity, pet.radiant
+	-- moments built to be clipped (bible B15): offered to that player only, where the platform allows
+	if pet.rarity == "Legendary" or pet.rarity == "Secret" then
+		if result.success and result.perfectAll then Net.send(player, "ClipMoment", { kind = "perfect3", floor = pet.floor })
+		elseif result.lastBeatMiss then Net.send(player, "ClipMoment", { kind = "so_close", floor = pet.floor }) end
+	end
+	if result.success and #profile.stack >= 10 then Net.send(player, "ClipMoment", { kind = "stack10", floor = pet.floor }) end
 	if try.tutorial then
 		local tut = Pets.tutorial[player]
 		if tut then tut.part:Destroy() Pets.tutorial[player] = nil end

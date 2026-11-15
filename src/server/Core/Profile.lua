@@ -29,6 +29,7 @@ function Profile.new(now)
 		lastSeen = now, firstJoin = now,
 		egg = false, eggDay = 0, weekly = {}, purchases = {}, codes = {},
 		passes = {}, looks = {}, -- pass key -> true ; look id -> true
+		equipped = {}, -- slot (aura, trail, camp, lift, trim) -> look id
 		restedUntil = 0, lastPlayDay = 0, helperStars = 0,
 		settings = { music = 1, effects = 1, lowGraphics = false, tapAssist = false, reducedFlash = false },
 		tutorial = 0,
@@ -353,6 +354,26 @@ function Profile.chooseForm(p, form)
 	if form ~= "dawn" and form ~= "dusk" then return false, "bad_form" end
 	p.starter.form = form
 	return true
+end
+
+-- Closet: wear a look you own. Slot comes from the look id's prefix. "" takes the slot's look off.
+Profile.LookSlots = { aura = "aura", weekly = "aura", trim = "trim", trail = "trail", camp = "camp", decor = "camp", lift = "lift" }
+function Profile.lookSlot(look)
+	if type(look) ~= "string" then return nil end
+	return Profile.LookSlots[string.match(look, "^(%a+)_") or ""]
+end
+function Profile.equip(p, look, slotToClear)
+	p.equipped = p.equipped or {}
+	if look == "" then
+		if not slotToClear or p.equipped[slotToClear] == nil then return false, "bad_slot" end
+		p.equipped[slotToClear] = nil
+		return true, slotToClear
+	end
+	local slot = Profile.lookSlot(look)
+	if not slot then return false, "bad_look" end
+	if not p.looks[look] then return false, "not_owned" end
+	p.equipped[slot] = look
+	return true, slot
 end
 
 -- Settings (bible B12) ---------------------------------------------------------

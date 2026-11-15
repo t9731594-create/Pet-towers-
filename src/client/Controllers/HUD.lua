@@ -17,11 +17,14 @@ function HUD.init()
 		TextColor3 = Color3.fromRGB(255, 150, 150), Text = "" })
 	local feed = Ui.label(gui, { Name = "Feed", Position = UDim2.fromOffset(12, 52), Size = UDim2.fromOffset(170, 26), TextXAlignment = Enum.TextXAlignment.Left,
 		TextColor3 = Color3.fromRGB(255, 190, 150), Text = "" })
+	local mult = Ui.label(gui, { Name = "Mult", Position = UDim2.fromOffset(12, 80), Size = UDim2.fromOffset(90, 24), TextXAlignment = Enum.TextXAlignment.Left,
+		TextColor3 = Color3.fromRGB(150, 230, 150), Text = "" })
 	Remotes.get("State").OnClientEvent:Connect(function(profile, extra)
 		HUD.state, HUD.extra = profile, extra
 		coins.Text = F.short(profile.coins)
 		floor.Text = tostring(math.min(profile.cleared + 1, 100))
 		power.Text = profile.starter and F.short(extra.teamPower) or ""
+		mult.Text = (extra.coinMult or 1) > 1 and string.format("x%.1f", extra.coinMult) or ""
 		feed.Text = profile.starter and ("Lv " .. profile.starter.level .. "  >  " .. F.short(extra.feedCost)) or ""
 		for _, fn in ipairs(HUD.listeners) do task.spawn(fn, profile, extra) end
 	end)

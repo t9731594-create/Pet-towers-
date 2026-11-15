@@ -35,6 +35,8 @@ function Data.push(player)
 	extra.income = Profile.incomePerSecond(p)
 	extra.stackCap = Profile.stackCap(p)
 	extra.feedCost = p.starter and F.levelCost(p.starter.level) or 0
+	extra.coinMult = require(script.Parent.CoinMult)(player, p)
+	extra.index = { Profile.indexCount(p) }
 	Data.extras[player] = extra
 	Net.send(player, "State", p, extra)
 	local ls = player:FindFirstChild("leaderstats")
