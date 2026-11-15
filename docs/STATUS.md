@@ -1,6 +1,6 @@
 # Status
 
-**Milestone:** M0-M6 rules and greybox services written on `dev` (with Amendment 1), headless-tested only: check_lua 69 files, 0 syntax errors; tests 129 passed, 0 failed. Waiting for the owner's OK before `dev` goes into `main`, and for the Mac for every Studio test.
+**Milestone:** M0-M6 rules and greybox services, the weekly systems and Amendment 1 are written on `dev`, headless-tested only: check_lua 85 files, 0 syntax errors; tests 166 passed, 0 failed. Waiting for the Mac for every Studio test and for the owner's OK before `dev` goes into `main`.
 **Owner account:** FantasyGaming (@Talleyrandw).
 **Where this lives:** github.com/t9731594-create/Pet-towers- (`main` = M0, `dev` = current, plus the five Amendment 1 branches). Not yet on the SanDisk.
 
@@ -34,8 +34,11 @@
 - Asset library not read (it is on the SanDisk).
 - Neighbour games, titles and names: checked by web search only (docs/LAUNCH_RESEARCH.md). No trademark search.
 - Roblox docs check: done against the docs source, not Creator Hub itself (docs/API_CHECK.md).
-- Not built: Weekly Guardian, weekend merchant, monument, Dawn-vs-Dusk weekly scale, Tower Trophy, Closet,
-  Index Board screen, settings screen, sound, murals, debug panel, M7 art, M8 hardening.
+- Built in greybox since: Weekly Guardian, weekend merchant, monument, Dawn-vs-Dusk scale, Tower Trophy,
+  Index Board, settings, team screen, sound hooks (no sounds), Studio debug panel, a randomized hardening test.
+- Not built: Closet (wearing looks), murals, lantern bloom per player, real HUD art, all sound, M7 art,
+  M8 device and soak tests.
+- Proposals waiting: docs/TUNING_PROPOSAL.md (not applied), docs/launch/ drafts (not sent).
 
 ## Next
 1. Follow docs/HANDOFF_MAC.md on the Mac: clone to the SanDisk, new place, install, fix engine errors.
