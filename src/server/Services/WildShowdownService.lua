@@ -23,10 +23,13 @@ local function wildStats(profile)
 	return stats.wild
 end
 
-local function snapshot(entry)
+-- mine = true only in the copy sent to players who are in the showdown now: the snapshot goes to the
+-- whole floor, and a client draws the ring only when the server says it is in.
+local function snapshot(entry, mine)
 	local snap = Showdown.snapshot(entry.s.sd) -- floor, kind = "wild", start, ends = nil, meter, left, count
 	snap.petId = entry.pet.id
 	snap.rarity = entry.pet.rarity
+	if mine then snap.mine = true end
 	return snap
 end
 
@@ -47,6 +50,13 @@ local function tellEnd(entry, won)
 			end
 		end
 	end
+end
+
+-- One player stepped out (walked away or left the floor) while the pet still wants to play: free their
+-- cheers and close their ring. `left = true` means "you stepped out", not "the pet left".
+local function tellLeft(player, entry)
+	release(player, entry)
+	Net.send(player, "ShowdownEnd", { kind = "wild", petId = entry.pet.id, floor = entry.pet.floor, won = false, left = true })
 end
 
 -- The meter is empty: the pet now trusts everyone who played. Runs once per pet.
@@ -105,7 +115,7 @@ local function join(player, profile, petId)
 		local w = wildStats(profile)
 		w.started = w.started + 1
 	end
-	Net.send(player, "ShowdownState", snapshot(entry))
+	Net.send(player, "ShowdownState", snapshot(entry, true))
 end
 
 -- One pass over every pet that still wants to play.
@@ -113,24 +123,36 @@ local function step(now)
 	for _, entry in pairs(Wild.sessions) do
 		local s = entry.s
 		if s.state == "active" then
-			-- players who left the floor or the game step out; what they drained stays drained
+			-- players who walked away, left the floor or left the game step out; what they drained stays drained
+			local part = Pets.partOf(entry.pet)
 			local gone = {}
 			for id in pairs(s.sd.players) do
 				local player = Players:GetPlayerByUserId(id)
-				if not player or Pets.floorOf(player) ~= entry.pet.floor then gone[#gone + 1] = id end
+				if not player or Pets.floorOf(player) ~= entry.pet.floor then
+					gone[#gone + 1] = id
+				else
+					local hrp = Pets.root(player)
+					local distance = nil
+					if part and hrp then distance = (hrp.Position - part.Position).Magnitude end
+					if WildCore.leash(s, id, distance, now) then gone[#gone + 1] = id end
+				end
 			end
 			for _, id in ipairs(gone) do
 				WildCore.stepOut(s, id, now)
 				local player = Players:GetPlayerByUserId(id)
-				if player then release(player, entry) end
+				-- if stepping out found the meter already empty, playedOut below tells everyone instead
+				if player and s.state == "active" then tellLeft(player, entry) end
 			end
-			if #gone > 0 then ShowdownCore.refreshFriends(s.sd, Friends.are) end
+			if #gone > 0 and s.state == "active" then ShowdownCore.refreshFriends(s.sd, Friends.are) end
 			local state = WildCore.tick(s, now)
 			if s.sd.count > 0 then
-				local snap = snapshot(entry)
-				-- everyone on the floor hears about it: participants draw the ring, the rest get the join icon
+				local snap, mine = snapshot(entry), snapshot(entry, true)
+				-- everyone on the floor hears about it: players who are in draw the ring, the rest get the join icon
 				for _, player in ipairs(Players:GetPlayers()) do
-					if Pets.floorOf(player) == entry.pet.floor then Net.send(player, "ShowdownState", snap) end
+					if Pets.floorOf(player) == entry.pet.floor then
+						-- (the players table, not WildCore.isIn: the last snapshot, meter empty, is still "mine")
+						Net.send(player, "ShowdownState", s.sd.players[player.UserId] and mine or snap)
+					end
 				end
 			end
 			if state == "won" then playedOut(entry) end
