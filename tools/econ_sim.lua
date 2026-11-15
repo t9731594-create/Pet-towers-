@@ -4,6 +4,8 @@
 -- earners on its pads, buys the floor's Charm, then whatever adds most Team Power per coin, and
 -- gets 3,600 s of income at each session break (18 min sessions). It ignores natures, friend and
 -- rested bonuses, treasure and index sets.
+-- Amendment 1: every Epic / Legendary try costs Economy.Sim.ExtraTrySeconds of play time first.
+-- The word noWild (opts.noWild = true) switches that off, for a before / after comparison.
 local Config = require(Shared.Config)
 local F = require(Shared.Logic.Formulas)
 local E, P = Config.Economy, Config.Pets
@@ -28,9 +30,19 @@ local function rollRarity(rand)
 	return "Common"
 end
 
--- opts: extraTrySeconds = { Epic = n, Legendary = n } (Amendment 1), buyPads = bool
+-- The extra seconds per try, by rarity, that these opts ask for (an empty table = none).
+function Sim.extraTrySeconds(opts)
+	opts = opts or {}
+	if opts.noWild then return {} end
+	return opts.extraTrySeconds or S.ExtraTrySeconds or {}
+end
+
+-- opts: buyPads = bool; noWild = bool (no play time before tries);
+-- extraTrySeconds = { Epic = n, Legendary = n } replaces Economy.Sim.ExtraTrySeconds.
 function Sim.run(seed, opts)
 	opts = opts or {}
+	local extra = Sim.extraTrySeconds(opts)
+	local tries, extraSeconds = {}, 0
 	local rand = rng(seed)
 	local t, coins = 0, E.StartCoins
 	local level, cleared, charm = 1, 0, 1
@@ -115,7 +127,11 @@ function Sim.run(seed, opts)
 		local caught = {}
 		for _ = 1, S.CatchesPerTrip do
 			local rarity = rollRarity(rand)
-			if opts.extraTrySeconds and opts.extraTrySeconds[rarity] then trip = trip + opts.extraTrySeconds[rarity] end
+			tries[rarity] = (tries[rarity] or 0) + 1
+			if extra[rarity] then
+				trip = trip + extra[rarity]
+				extraSeconds = extraSeconds + extra[rarity]
+			end
 			if rand() < S.CatchSuccess[rarity] then
 				caught[#caught + 1] = { species = P.ByFloor[floor][rarity], rarity = rarity, hearts = 0 }
 			end
@@ -135,7 +151,7 @@ function Sim.run(seed, opts)
 			wins[cleared] = t
 		end
 	end
-	return { wins = wins, evo = evo, level = level }
+	return { wins = wins, evo = evo, level = level, tries = tries, extraSeconds = extraSeconds }
 end
 
 function Sim.table(runs, opts)
@@ -161,7 +177,11 @@ end
 
 function Sim.print(runs, opts, title)
 	local r = Sim.table(runs, opts)
-	print(title or ("econ_sim, " .. runs .. " runs, mean active minutes"))
+	local ex = Sim.extraTrySeconds(opts)
+	local wild = (ex.Epic or ex.Legendary)
+		and string.format("play time per try: Epic +%g s, Legendary +%g s", ex.Epic or 0, ex.Legendary or 0)
+		or "no play time before tries"
+	print(title or ("econ_sim, " .. runs .. " runs, mean active minutes, " .. wild))
 	print("Guardian | sim min | bible min | day")
 	for f = 1, Config.Floors.Count do
 		print(string.format("   %d     | %7.1f | %9d | %d", f, r.wins[f] or -1, S.TargetWinMinutes[f], day(r.wins[f] or 0)))
@@ -174,7 +194,10 @@ end
 if ARGS and ARGS[1] ~= "lib" then
 	local runs = tonumber(ARGS[1]) or 300
 	local opts = {}
-	for i = 2, #ARGS do if ARGS[i] == "buyPads" then opts.buyPads = true end end
+	for i = 1, #ARGS do
+		if ARGS[i] == "buyPads" then opts.buyPads = true end
+		if ARGS[i] == "noWild" then opts.noWild = true end
+	end
 	Sim.print(runs, opts)
 end
 return Sim
