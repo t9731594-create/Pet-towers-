@@ -21,6 +21,7 @@ local Mock = {}
 local unpack = unpack
 local function pack(...) return { n = select("#", ...), ... } end
 
+Mock.lineHook = nil -- set to a debug.sethook "l" function before a run to trace every game thread (line coverage)
 Mock.FRAME = 1 / 32 -- seconds between Heartbeat / RenderStepped frames
 Mock.MIN_WAIT = 1 / 64 -- task.wait() with no argument
 local SRC = ROOT .. "/src"
@@ -108,6 +109,7 @@ local function spawnIn(ctx, fn, ...)
 	if type(fn) ~= "function" then problem("task.spawn: function or thread expected, got " .. type(fn), 3) end
 	local co = coroutine.create(fn)
 	threadCtx[co] = ctx
+	if Mock.lineHook then debug.sethook(co, Mock.lineHook, "l") end
 	drive(co, ...)
 	return co
 end
@@ -163,6 +165,7 @@ end
 local function copcall(f, ...)
 	if type(f) ~= "function" then return pcall(f, ...) end
 	local co = coroutine.create(f)
+	if Mock.lineHook then debug.sethook(co, Mock.lineHook, "l") end
 	local function handle(ok, ...)
 		if not ok then return false, ... end
 		if coroutine.status(co) == "dead" then return true, ... end

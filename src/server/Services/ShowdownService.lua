@@ -25,6 +25,8 @@ local function playerById(id) return Players:GetPlayerByUserId(id) end
 local function join(player, profile, f)
 	local floor = World.floors[f]
 	if not floor or (player:GetAttribute("Floor") or 0) ~= f or not profile.starter then return end
+	-- already cheering somewhere (a wild or weekly showdown): do not start a Guardian showdown with nobody in it
+	if Showdown.byPlayer[player] then return end
 	local now = Net.now()
 	local sd = Showdown.active[f]
 	if not sd then
@@ -33,7 +35,7 @@ local function join(player, profile, f)
 		sd = ShowdownCore.guardian(f, guardian.nature, now)
 		Showdown.active[f] = sd
 	end
-	if sd.players[player.UserId] or Showdown.byPlayer[player] then return end
+	if sd.players[player.UserId] then return end
 	if ShowdownCore.join(sd, player.UserId, Profile.teamPower(profile, sd.nature), now) then
 		Showdown.byPlayer[player] = sd
 		ShowdownCore.refreshFriends(sd, Friends.are)

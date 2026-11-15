@@ -197,8 +197,10 @@ function Camp.init()
 				ch:PivotTo(camp.spawn)
 			end
 			player:SetAttribute("Floor", 0)
+			Data.setExtra(player, "floor", 0) -- a respawn from a floor lands at camp: tell the client too
 			Camp.refreshStarter(player, profile)
 			Pets.refreshStack(player, profile)
+			Data.push(player)
 		end
 		player.CharacterAdded:Connect(onCharacter)
 		if player.Character then task.spawn(onCharacter, player.Character) end

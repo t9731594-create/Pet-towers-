@@ -171,4 +171,44 @@ function H.waitFor(client, name, limit, before)
 	return H.count(client, name) > before
 end
 
+-- Client side: the player's screen ---------------------------------------------------------------------
+function H.gui(player, screen) return player.PlayerGui:FindFirstChild(screen) end
+-- The first button under a ScreenGui whose text is `text` (the greybox buttons have no names).
+function H.button(player, screen, text)
+	local gui = H.gui(player, screen)
+	if not gui then error("no ScreenGui named " .. screen, 2) end
+	for _, d in ipairs(gui:GetDescendants()) do
+		if d:IsA("GuiButton") and d.Text == text then return d end
+	end
+	error("no button '" .. text .. "' in " .. screen, 2)
+end
+function H.shown(inst)
+	while inst and inst:IsA("GuiObject") do
+		if not inst.Visible then return false end
+		inst = inst.Parent
+	end
+	return true
+end
+-- Tap a button the way a finger would: it must be on screen.
+function H.press(button)
+	if not H.shown(button) then error("press: the button '" .. tostring(button.Text) .. "' is not visible", 2) end
+	Mock.signalOf(button, "Activated"):Fire()
+	Mock.flush()
+end
+-- What the server heard from this player under `name`: a list of argument lists.
+function H.heard(world, player, name)
+	local out = {}
+	for _, e in ipairs(world.received) do
+		if e.name == name and e.player == player then out[#out + 1] = e.args end
+	end
+	return out
+end
+-- Send a payload from the server to one client, as Net.send does.
+function H.send(world, player, name, ...)
+	local remote = world:remote(name)
+	local args = { n = select("#", ...), ... }
+	world.server:run(function() remote:FireClient(player, unpack(args, 1, args.n)) end)
+	Mock.flush()
+end
+
 return H

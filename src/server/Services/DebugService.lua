@@ -21,7 +21,12 @@ local commands = {
 		local f, hrp = Pets.floorOf(player), Pets.root(player)
 		if f >= 1 and hrp then Pets.spawnOn(f, { rarity = "Common", radiant = true }, hrp.Position + Vector3.new(12, 0, 0)) end
 	end,
-	away = function(_, p, hours) p.lastSeen = os.time() - (tonumber(hours) or 16) * 3600 end, -- then rejoin
+	away = function(player, p, hours) -- then rejoin. (Saving stamps lastSeen, so the save is told the pretend time.)
+		local seconds = (tonumber(hours) or 16) * 3600
+		Data.away[player] = seconds
+		p.lastSeen = os.time() - seconds
+		p.lastPlayDay = math.floor(p.lastSeen / 86400) -- the journey ladder counts UTC days
+	end,
 	egg = function(_, p) if p.egg then p.egg.start = os.time() - 9 * 3600 end end,
 	stack = function(_, p, n) p.upgrades.stack = math.min(7, tonumber(n) or 7) end,
 	wipe = function(player, p) -- fresh profile on next join

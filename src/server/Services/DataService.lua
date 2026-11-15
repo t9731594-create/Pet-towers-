@@ -9,7 +9,9 @@ local F = require(ReplicatedStorage.Shared.Logic.Formulas)
 local E = require(ReplicatedStorage.Shared.Config).Economy
 local Net = require(script.Parent.Net)
 
-local Data = { profiles = {}, loaded = {}, extras = {} }
+local Data = { profiles = {}, loaded = {}, extras = {}, away = {} }
+-- away[player] = seconds the Studio debug command "away" pretends the player has been gone: every save
+-- stamps lastSeen with the time now, so the pretend time has to be taken off there.
 local STORE_NAME = "PetTower_PlayerData_v1"
 local core
 
@@ -77,8 +79,8 @@ end
 local function save(player, release)
 	local p = Data.profiles[player]
 	if not p then return end
-	p.lastSeen = os.time()
-	if release then Data.profiles[player] = nil Data.extras[player] = nil end -- first, so a second caller does nothing
+	p.lastSeen = os.time() - (Data.away[player] or 0)
+	if release then Data.profiles[player] = nil Data.extras[player] = nil Data.away[player] = nil end -- first, so a second caller does nothing
 	local ok, why = core:save(key(player), p, release)
 	if not ok then warn("[PetTower] save failed for " .. player.UserId .. ": " .. tostring(why)) end
 end
@@ -87,7 +89,7 @@ end
 function Data.saveNow(player)
 	local p = Data.profiles[player]
 	if not p then return false end
-	p.lastSeen = os.time()
+	p.lastSeen = os.time() - (Data.away[player] or 0)
 	local ok = core:save(key(player), p, false)
 	return ok
 end

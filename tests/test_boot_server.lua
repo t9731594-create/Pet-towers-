@@ -1495,4 +1495,263 @@ function tests.k06_camp_stations_buy_upgrades()
 	H.clean("camp stations")
 end
 
+-- More corners ---------------------------------------------------------------------------------------------
+function tests.m01_a_player_in_a_wild_showdown_cannot_start_a_guardian_showdown()
+	local world = H.fresh()
+	local ann, ca = H.ready(world, 101, "Ann")
+	local bob, cb = H.ready(world, 102, "Bob")
+	H.debug(cb, "level", 12)
+	H.lift(world, ann, ca, 1)
+	H.lift(world, bob, cb, 1)
+	-- Ann plays with a Legendary right next to the Guardian ring
+	local ring = H.floor(world, 1).ring
+	world:walkTo(ann, V3.new(ring.Position.X - 12, 403, ring.Position.Z))
+	local ball, id = spawnWild(world, ca, "Legendary")
+	ca:fire("WildJoin", id)
+	Mock.step(1)
+	local Showdown = H.svc(world, "ShowdownService")
+	T.ok(Showdown.byPlayer[ann], "Ann is in the wild showdown")
+	toRing(world, ann, 1)
+	Mock.step(0.5)
+	T.eq(Showdown.active[1], nil, "no Guardian showdown starts with nobody in it")
+	-- so Bob, walking in 20 s later, gets a whole showdown, not the tail of an empty one
+	Mock.step(20)
+	cb:clear()
+	toRing(world, bob, 1)
+	Mock.step(0.1)
+	local snap = H.payload(cb, "ShowdownState")
+	T.ok(snap, "Bob's showdown starts")
+	T.near(snap.start, Mock.now, 0.2, "it starts when he walks in")
+	T.eq(snap.left > 700, true, "with a full meter")
+	T.ok(H.waitFor(cb, "ShowdownEnd", 45))
+	T.ok(H.payload(cb, "ShowdownEnd").won)
+	H.clean("no empty showdown")
+end
+
+function tests.m02_seven_players_in_the_guardian_ring()
+	local world = H.fresh()
+	local players, clients = {}, {}
+	for i = 1, 7 do
+		players[i], clients[i] = H.ready(world, 400 + i, "S" .. i)
+		H.lift(world, players[i], clients[i], 1)
+	end
+	for i = 1, 7 do clients[i]:clear() toRing(world, players[i], 1) Mock.step(0.3) end
+	T.eq(H.payload(clients[7], "ShowdownState").count, 7)
+	H.cheerUntil(world, clients, H.payload(clients[1], "ShowdownState"), "ShowdownEnd", 45)
+	for i = 1, 7 do
+		T.ok(H.payload(clients[i], "ShowdownEnd").won, "seven Lv 1 teams win together")
+		T.eq(H.payload(clients[i], "ShowdownEnd").count, 7)
+		T.eq(H.payload(clients[i], "ClipMoment").kind, "guardian7", "a moment worth a clip")
+		T.eq(H.profile(world, players[i]).cleared, 1)
+	end
+	H.clean("seven in the ring")
+end
+
+function tests.m03_so_close_on_a_legendary_and_a_late_join()
+	local world = H.fresh()
+	local ann, ca = H.ready(world, 101, "Ann")
+	local bob, cb = H.ready(world, 102, "Bob")
+	H.debug(ca, "level", 12)
+	H.lift(world, ann, ca, 1)
+	H.lift(world, bob, cb, 1)
+	world:walkTo(ann, V3.new(-60, 403, 0))
+	world:walkTo(bob, V3.new(-60, 403, 0))
+	local ball, id = spawnWild(world, ca, "Legendary")
+	ca:clear() cb:clear()
+	ca:fire("WildJoin", id)
+	T.ok(H.waitFor(ca, "ShowdownEnd", 20))
+	-- Bob asks after the meter is empty: too late, he did not play
+	cb:fire("WildJoin", id)
+	Mock.step(0.5)
+	cb:fire("TryStart", id)
+	Mock.step(0.5)
+	T.eq(H.count(cb, "TryBegin"), 0)
+	T.eq(H.svc(world, "ShowdownService").byPlayer[bob], nil)
+	-- Ann misses the last ring of a Legendary: "so close"
+	ca:fire("TryStart", id)
+	Mock.step(0.05)
+	local result = H.playTry(world, ca, { "Perfect", "Perfect", "Miss" })
+	T.no(result.success)
+	T.ok(result.lastBeatMiss)
+	T.eq(H.payload(ca, "ClipMoment").kind, "so_close")
+	T.eq(#H.profile(world, ann).stack, 0)
+	-- after three failed tries in a row the rings slow down (assist) until two catches
+	H.clean("so close")
+end
+
+function tests.m04_pending_choice_is_offered_again_after_a_rejoin()
+	local world = H.fresh()
+	local ann, c = H.ready(world, 101, "Ann")
+	H.debug(c, "level", 12)
+	H.lift(world, ann, c, 1)
+	toRing(world, ann, 1)
+	T.ok(H.waitFor(c, "ShowdownEnd", 45))
+	world:removePlayer(ann) -- leaves without choosing
+	Mock.step(2)
+	local ann2, c2 = H.join(world, 101, "Ann")
+	T.eq(H.payload(c2, "ChoicePrompt"), 1, "Share or Keep for Floor 1 is offered again")
+	T.eq(ann2:GetAttribute("Side"), "")
+	c2:fire("Choose", 1, "keep")
+	Mock.step(0.3)
+	T.eq(H.profile(world, ann2).floors["1"].choice, "keep")
+	T.eq(H.count(c2, "ChoicePrompt"), 1, "nothing else is waiting")
+	H.clean("pending choice")
+end
+
+function tests.m05_weekly_keep_is_silent()
+	local world = H.fresh()
+	local ann, c = H.ready(world, 101, "Ann")
+	local bob, cb = H.ready(world, 102, "Bob")
+	local ring = world.workspace.PetTowerWorld.WeeklyRing
+	world:walkTo(ann, V3.new(ring.Position.X, 3, ring.Position.Z))
+	world:walkTo(bob, V3.new(ring.Position.X + 5, 3, ring.Position.Z))
+	world:touch(ring, ann)
+	Mock.step(0.3)
+	world:touch(ring, bob)
+	Mock.step(0.3)
+	local snap = H.payload(c, "ShowdownState")
+	T.eq(snap.count, 2)
+	H.cheerUntil(world, { c, cb }, snap, "ShowdownEnd", 45)
+	T.ok(H.payload(c, "ShowdownEnd").won and H.payload(cb, "ShowdownEnd").won, "two players with Perfect cheers win")
+	c:clear() cb:clear()
+	cb:fire("ChooseWeekly", "keep")
+	Mock.step(0.3)
+	T.eq(cb:got("Coins")[1][2], "keep")
+	T.eq(H.count(c, "Coins"), 0)
+	T.eq(H.count(c, "Shared"), 0, "keeping is never announced")
+	T.eq(H.count(cb, "Shared"), 0)
+	T.eq(H.profile(world, bob).dusk, 1)
+	T.eq(bob:GetAttribute("Side"), "dusk")
+	-- a player who is in the weekly showdown cannot be pulled into another one, and riding away is harmless
+	H.clean("weekly keep")
+end
+
+function tests.m06_auto_collect_pass_empties_the_pads()
+	local world = H.fresh()
+	local Config = config(world)
+	Config.Shop.PassIds.AutoCollect = 7004
+	world.passes["101:7004"] = true
+	local ann, c = H.ready(world, 101, "Ann")
+	T.eq(H.profile(world, ann).passes.AutoCollect, true)
+	c:clear()
+	Mock.step(11)
+	local pops = c:got("Coins")
+	T.ok(#pops >= 2, "the pads empty themselves every 5 s")
+	T.eq(pops[1][2], "pads")
+	Config.Shop.PassIds.AutoCollect = nil
+	H.clean("auto collect")
+end
+
+function tests.m07_a_friend_in_the_server_gives_both_more_coins()
+	local world = H.fresh()
+	world.friends["101:102"] = true
+	local ann, ca = H.ready(world, 101, "Ann")
+	local bob, cb = H.ready(world, 102, "Bob")
+	local cat, cc = H.ready(world, 103, "Cat")
+	local Friends = H.svc(world, "FriendService")
+	T.ok(Friends.are(101, 102) and Friends.are(102, 101))
+	T.no(Friends.are(101, 103))
+	T.near(cb:last("State")[2].coinMult, 1.2, 1e-9, "Bob has a friend here")
+	T.eq(cc:last("State")[2].coinMult, 1)
+	ca:fire("Collect")
+	Mock.step(0.2)
+	T.near(ca:last("State")[2].coinMult, 1.2, 1e-9, "and so has Ann")
+	-- in a showdown a friend's cheer counts double
+	H.debug(ca, "level", 8)
+	H.debug(cb, "level", 8)
+	H.lift(world, ann, ca, 1)
+	H.lift(world, bob, cb, 1)
+	toRing(world, ann, 1)
+	Mock.step(0.3)
+	toRing(world, bob, 1)
+	Mock.step(0.3)
+	local sd = H.svc(world, "ShowdownService").active[1]
+	T.eq(sd.players[101].friend, true)
+	T.eq(sd.players[102].friend, true)
+	T.ok(H.waitFor(ca, "ShowdownEnd", 45))
+	-- the friend leaves: the bonus goes with them
+	world:removePlayer(bob)
+	Mock.step(1)
+	T.no(Friends.are(101, 102))
+	ca:fire("Collect")
+	Mock.step(0.2)
+	T.eq(ca:last("State")[2].coinMult, 1)
+	-- a friends check that fails is simply "not friends"
+	world.friendError = "HTTP 429"
+	local dan = H.join(world, 104, "Dan")
+	T.no(Friends.are(101, 104))
+	H.clean("friends")
+end
+
+function tests.m08_respawn_on_a_floor_brings_the_player_home()
+	local world = H.fresh()
+	local ann, c = H.ready(world, 101, "Ann")
+	H.lift(world, ann, c, 1)
+	T.eq(c:last("State")[2].floor, 1)
+	world:walkTo(ann, V3.new(500, -400, 0)) -- fell off the edge
+	world:spawnCharacter(ann)
+	Mock.step(1)
+	T.eq(ann:GetAttribute("Floor"), 0)
+	T.near((H.pos(world, ann) - H.camp(world, ann).spawn.Position).Magnitude, 0, 0.01, "back at the camp spawn")
+	T.ok(ann.Character:FindFirstChild("StarterPet"), "the starter is at the new character's side")
+	c:fire("Collect")
+	Mock.step(0.3)
+	T.eq(c:last("State")[2].floor, 0, "the client is told the player is at camp")
+	H.clean("respawn")
+end
+
+function tests.m09_debug_away_then_rejoin_shows_the_welcome_back()
+	local world = H.fresh()
+	local ann, c = H.ready(world, 101, "Ann")
+	Mock.step(70)
+	H.debug(c, "away", 16)
+	H.debug(c, "egg")
+	world:removePlayer(ann)
+	Mock.step(2)
+	local ann2, c2 = H.join(world, 101, "Ann")
+	local w = H.payload(c2, "Welcome")
+	T.ok(w.away >= 16 * 3600 and w.away < 16 * 3600 + 30, "away 16 hours, got " .. w.away)
+	T.eq(w.chest, 3600)
+	T.eq(w.rested, true)
+	T.eq(w.journeyDay, 2, "16 hours before Friday 14:00 UTC was Thursday: a new day")
+	T.eq(w.egg.state, "ready")
+	-- the other debug commands
+	H.debug(c2, "stack", 7)
+	T.eq(c2:last("State")[2].stackCap, 10)
+	H.debug(c2, "clear")
+	T.eq(H.profile(world, ann2).cleared, 1)
+	H.lift(world, ann2, c2, 1)
+	H.debug(c2, "radiant")
+	local radiant
+	for _, ball in ipairs(H.petParts(world, 1)) do if ball:GetAttribute("Radiant") then radiant = ball end end
+	T.ok(radiant and radiant:FindFirstChild("Pillar"), "a Radiant pet under a pillar")
+	T.eq(radiant.Material, Mock.Enum.Material.Neon)
+	H.debug(c2, "wipe")
+	T.eq(H.profile(world, ann2).starter, nil)
+	T.eq(H.state(c2).coins, 50)
+	H.clean("debug commands")
+end
+
+function tests.m10_three_misses_turn_the_assist_on()
+	local world = H.fresh()
+	local ann, c = H.ready(world, 101, "Ann")
+	H.lift(world, ann, c, 1)
+	local tried = 0
+	local last
+	for _, ball in ipairs(H.petParts(world, 1)) do
+		if tried < 4 and not ball:GetAttribute("NeedsPlay") and ball:GetAttribute("Rarity") == "Common" then
+			H.walkNear(world, ann, ball.Position, 4)
+			c:fire("TryStart", ball:GetAttribute("PetId"))
+			Mock.step(0.6)
+			last = H.payload(c, "TryBegin")
+			tried = tried + 1
+			if tried < 4 then T.no(H.playTry(world, c, { "Miss", "Miss", "Miss" }).success) end
+		end
+	end
+	T.eq(tried, 4, "four Commons to try")
+	T.near(last.ringTime, 1.2 * 1.2, 1e-9, "after three misses the rings run 20% slower")
+	T.ok(H.playTry(world, c).success)
+	H.clean("assist")
+end
+
 return tests
