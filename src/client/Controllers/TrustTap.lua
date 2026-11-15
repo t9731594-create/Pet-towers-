@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes = require(ReplicatedStorage:WaitForChild("Shared").Net.Remotes)
 local Ui = require(script.Parent.Ui)
 local Rings = require(script.Parent.Rings)
+local HUD = require(script.Parent.HUD)
 
 local TrustTap = { current = nil, asked = {}, blocked = false }
 local APPROACH = 9 -- studs: closer than the server's 15 so latency never fails the distance check
@@ -31,6 +32,13 @@ local function nearestPet()
 		end
 	end
 	return best
+end
+
+-- With a full stack the server refuses the try. Asking anyway would mark the pet as asked, and it
+-- could then never be tried, even after the pets on the head have been put down.
+local function stackFull()
+	local p, extra = HUD.state, HUD.extra
+	return p ~= nil and extra ~= nil and type(extra.stackCap) == "number" and #p.stack >= extra.stackCap
 end
 
 function TrustTap.init()
@@ -67,7 +75,7 @@ function TrustTap.init()
 	task.spawn(function()
 		while true do
 			task.wait(0.2)
-			if not TrustTap.current and not TrustTap.blocked then
+			if not TrustTap.current and not TrustTap.blocked and not stackFull() then
 				local id = nearestPet()
 				if id then
 					TrustTap.asked[id] = true -- one try per pet

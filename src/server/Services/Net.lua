@@ -13,8 +13,12 @@ function Net.init()
 		Net.events[name] = r
 	end
 	for _, name in ipairs(Remotes.S2C) do
-		local r = Instance.new("RemoteEvent") r.Name = name r.Parent = folder
-		Net.events[name] = r
+		-- a name used in both directions (Emote) is ONE RemoteEvent: two with the same name would leave
+		-- the server listening on one and the clients (WaitForChild finds the first) on the other
+		if not Net.events[name] then
+			local r = Instance.new("RemoteEvent") r.Name = name r.Parent = folder
+			Net.events[name] = r
+		end
 	end
 	folder.Parent = ReplicatedStorage
 	game:GetService("Players").PlayerRemoving:Connect(function(player) Net.limiter:forget(player.UserId) end)

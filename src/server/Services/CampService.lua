@@ -132,7 +132,12 @@ local function wire(camp)
 		pad.Touched:Connect(function(hit)
 			local player = playerOf(hit)
 			local profile = player and camp.owner == player and Data.get(player)
-			if profile and debounced(player, "pad", 0.5) then collect(player, profile) end
+			if profile and debounced(player, "pad", 0.5) then
+				-- a pet caught inside the camp (the first one) never crosses the zone's edge, so Touched on
+				-- the zone does not fire for it: walking onto a pad puts the stack down too
+				if #profile.stack > 0 and (player:GetAttribute("Floor") or 0) == 0 then comeHome(player, profile) end
+				collect(player, profile)
+			end
 		end)
 	end
 	camp.zone.Touched:Connect(function(hit)
@@ -192,8 +197,10 @@ function Camp.init()
 				ch:PivotTo(camp.spawn)
 			end
 			player:SetAttribute("Floor", 0)
+			Data.setExtra(player, "floor", 0) -- a respawn from a floor lands at camp: tell the client too
 			Camp.refreshStarter(player, profile)
 			Pets.refreshStack(player, profile)
+			Data.push(player)
 		end
 		player.CharacterAdded:Connect(onCharacter)
 		if player.Character then task.spawn(onCharacter, player.Character) end
