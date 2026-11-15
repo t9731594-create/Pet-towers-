@@ -31,6 +31,7 @@ function Choice.init()
 			Net.all("Shared", { userId = player.UserId, name = player.DisplayName })
 		end
 		player:SetAttribute("Side", Profile.side(profile) or "")
+		Camp.refresh(player, profile) -- the Tower Trophy block turns gold or violet
 		Data.push(player)
 		local nextFloor = Profile.pendingChoice(profile)
 		if nextFloor then Net.send(player, "ChoicePrompt", nextFloor) end
@@ -43,6 +44,8 @@ function Choice.init()
 			Data.push(player)
 		end
 	end)
+	-- a first clear lights the floor's Tower Trophy block at once (nothing else redraws the camp then)
+	table.insert(require(script.Parent.ShowdownService).onClear, function(player, profile) Camp.refresh(player, profile) end)
 	Data.onLoaded(function(player, profile)
 		player:SetAttribute("Side", Profile.side(profile) or "")
 		local floor = Profile.pendingChoice(profile)
