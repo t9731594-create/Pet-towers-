@@ -1,0 +1,5 @@
+Written: six launch drafts for the owner to review (questionnaire answers, store page, creator outreach, patch-note template + Week 1 example, clip shot lists, soft-launch checklist). Nothing sent, posted or priced.
+Files: docs/launch/MATURITY_QUESTIONNAIRE.md, STORE_PAGE.md, CREATOR_OUTREACH.md, PATCH_NOTES_TEMPLATE.md, CLIP_SHOTLIST.md, SOFT_LAUNCH_CHECKLIST.md; docs/branches/docs-launch-drafts.md.
+Checks: store description 910 characters (limit 1,000); outreach messages 112 / 81 / 93 words (limit 120); each file 59-90 lines; no pressure words, no reference franchise named, unconfirmed research numbers kept marked; no file under src/, tools/, tests/ or the bible, decisions or status touched.
+Open questions: which title; shop on or off at soft launch (changes the purchases answer and one store line); do Mailbox codes and capture prompts change the questionnaire answers; pet count per Saturday (8 vs 10-12); what the monument shows; which Weekly Guardian in Week 1; vertical clips from a landscape game; the C5 gap (day-1 15%+ but short sessions).
+Requests: none.
