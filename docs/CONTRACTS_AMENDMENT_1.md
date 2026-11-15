@@ -32,6 +32,8 @@ A worker who needs a change in any of them writes `REQUEST: ...` in its note fil
 - S2C `ShowdownState` / `ShowdownEnd` / `CheerGrade` and C2S `Cheer` are reused with `kind = "wild"`.
   `ShowdownState` for wild: `{ kind = "wild", petId, rarity, floor, start, ends = nil, meter, left, count }`.
   `ShowdownEnd` for wild: `{ kind = "wild", petId, floor, won }` (won = meter empty, you may now try; false = the pet left).
+- Added by fix/wild-leash: wild `ShowdownState` goes to everyone on the floor with `mine = true` for players who are in;
+  wild `ShowdownEnd` carries `left = true` when the player walked away and the pet stays.
 - S2C `SecretChime({ floor, phase = "glow" | "here" | "gone", at, leaves })` (UTC seconds).
 - S2C `ClipMoment({ kind, floor })`.
 

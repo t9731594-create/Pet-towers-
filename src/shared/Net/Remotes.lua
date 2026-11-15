@@ -46,6 +46,8 @@ Remotes.S2C = {
 	-- Amendment 1. Wild showdowns reuse ShowdownState / ShowdownEnd / Cheer / CheerGrade with
 	-- kind = "wild" and two extra fields: petId, rarity. ShowdownEnd for kind "wild" carries
 	-- { kind, petId, won = true (meter empty: you may now try) | false (the pet left) }.
+	-- Wild ShowdownState goes to everyone on the floor and carries mine = true for players who are in.
+	-- Wild ShowdownEnd carries left = true when the player stepped out (walked away) and the pet stays.
 	"SecretChime", -- ({ floor, phase = "glow" | "here" | "gone", at, leaves })  times are UTC seconds
 	"Welcome", -- ({ away, chest, rested, newDay, journeyDay, ladderCoins, look, tomorrow = { minutes, look }, egg = { state, readyAt } })
 	"ChoicePrompt", -- (floor)  show the two big Share / Keep buttons
