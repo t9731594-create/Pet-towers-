@@ -783,4 +783,37 @@ function tests.f05_a_full_stack_does_not_use_up_the_try_on_a_pet()
 	H.clean("full stack")
 end
 
+function tests.f06_wick_points_at_the_next_thing_to_do()
+	local world, ann, c = start()
+	local anchor
+	for _, child in ipairs(world.workspace:GetChildren()) do
+		if child.Name == "Part" and child:FindFirstChildOfClass("Attachment") then anchor = child end
+	end
+	T.ok(anchor, "the beam's far end")
+	local function pointsAt(part, what)
+		Mock.step(0.6)
+		T.near((anchor.Position - (part.Position + V3.new(0, 3, 0))).Magnitude, 0, 0.01, "Wick points at " .. what)
+	end
+	local camp = H.camp(world, ann)
+	pointsAt(camp.pedestals.Narbub.ped, "the middle pedestal")
+	H.chooseStarter(world, ann)
+	pointsAt(H.tutorialPart(world, ann), "the first pet")
+	H.tutorialCatch(world, ann, c)
+	pointsAt(camp.pads[1], "the pads, with a pet on the head")
+	H.deposit(world, ann)
+	pointsAt(camp.SnackTable, "the Snack Table while a level can be bought and the team is too weak for the Guardian")
+	H.debug(c, "level", 12)
+	pointsAt(camp.Lift, "the lift once the team is strong enough")
+	H.lift(world, ann, c, 1)
+	pointsAt(H.findPet(world, 1, "Rare", true), "the pet under the pillar")
+	local rare = H.findPet(world, 1, "Rare", true)
+	H.debug(c, "stack", 0)
+	local p = H.profile(world, ann)
+	local Profile = H.core(world, "Profile")
+	for _ = 1, 3 do Profile.addCaught(p, "Buttercub", "Common", false) end
+	c:fire("Collect")
+	pointsAt(H.floor(world, 1).lift, "the lift home when the stack is full")
+	H.clean("wick")
+end
+
 return tests

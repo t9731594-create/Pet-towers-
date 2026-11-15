@@ -594,6 +594,10 @@ local function checkType(want, v, what)
 		if t ~= "EnumItem" or v.EnumType ~= Enum[want:sub(6)] then problem(what .. ": Enum." .. want:sub(6) .. " expected, got " .. (t == "EnumItem" and tostring(v) or t), 4) end
 	elseif t ~= want then
 		problem(what .. ": " .. want .. " expected, got " .. t, 4)
+	elseif t == "Vector3" and (v.X ~= v.X or v.Y ~= v.Y or v.Z ~= v.Z) then
+		problem(what .. ": NaN in a Vector3", 4)
+	elseif t == "CFrame" and (v.p.X ~= v.p.X or v.p.Y ~= v.p.Y or v.p.Z ~= v.p.Z) then
+		problem(what .. ": NaN in a CFrame", 4)
 	end
 	return v
 end
@@ -902,9 +906,17 @@ defclass("Model", "PVInstance", { props = "PrimaryPart:Instance:BasePart WorldPi
 	end,
 	PivotTo = function(inst, target)
 		if typeofv(target) ~= "CFrame" then problem("PivotTo: CFrame expected, got " .. typeofv(target), 2) end
-		local delta = target * inst:GetPivot():Inverse()
+		if target.p.X ~= target.p.X or target.p.Y ~= target.p.Y or target.p.Z ~= target.p.Z then problem("PivotTo: NaN in the CFrame", 2) end
+		-- the primary part gets the target exactly (no rounding builds up over many moves); the other
+		-- parts keep their place relative to it
+		local primary = inst.PrimaryPart
+		local inverse = inst:GetPivot():Inverse()
 		for _, d in ipairs(inst:GetDescendants()) do
-			if d:IsA("BasePart") then rawget(d, "_props").CFrame = delta * d.CFrame end
+			if d == primary then
+				rawget(d, "_props").CFrame = target
+			elseif d:IsA("BasePart") then
+				rawget(d, "_props").CFrame = target * (inverse * d.CFrame)
+			end
 		end
 		rawget(inst, "_props").WorldPivot = target
 	end,
@@ -1726,6 +1738,7 @@ function World:walkTo(player, position)
 	local ch = rawget(player, "_props").Character
 	if not ch then error("walkTo: " .. player.Name .. " has no character", 2) end
 	local hrp = findChild(ch, "HumanoidRootPart")
+	if position.X ~= position.X or position.Y ~= position.Y or position.Z ~= position.Z then error("walkTo: NaN position", 2) end
 	ch:PivotTo(cf(position, hrp.CFrame.r))
 end
 -- Is the character (a box about 4 x 5 x 4 studs around the root part) touching the part?

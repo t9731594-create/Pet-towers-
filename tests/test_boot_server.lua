@@ -1754,4 +1754,56 @@ function tests.m10_three_misses_turn_the_assist_on()
 	H.clean("assist")
 end
 
+function tests.n01_rejoining_the_same_server_at_once_keeps_the_last_changes()
+	local world = H.fresh(H.FRIDAY_14, { studio = false, jobId = "server-A" })
+	local ann, c = H.ready(world, 101, "Ann")
+	Mock.step(20)
+	c:fire("Collect")
+	Mock.step(0.2)
+	local coins = H.profile(world, ann).coins
+	T.ok(coins > 50)
+	world:removePlayer(ann) -- the save is still on its way to the store...
+	local ann2, c2 = world:addPlayer({ UserId = 101, Name = "Ann", DisplayName = "Ann" }) -- ...when the same player is back
+	Mock.step(5)
+	local p = H.profile(world, ann2)
+	T.ok(p, "loaded again")
+	T.eq(p.coins, coins, "with the coins from a moment ago")
+	T.eq(Mock.stores.PetTower_PlayerData_v1.u_101.lock.job, "server-A", "and the lock is held")
+	T.eq(#p.pets, 1)
+	H.clean("quick rejoin")
+end
+
+function tests.n02_datastore_trouble_during_play()
+	local world = H.fresh(H.FRIDAY_14, { studio = false, jobId = "server-A" })
+	local ann, c = H.ready(world, 101, "Ann")
+	-- the store goes down: the autosave fails with a warning, play goes on
+	Mock.datastore.fail = function(name) if name == "PetTower_PlayerData_v1" then return "502: API Services rejected request" end end
+	Mock.step(140)
+	T.ok(H.expectWarning("save failed for 101") >= 1, "the failed autosave is reported")
+	c:fire("Collect")
+	Mock.step(0.3)
+	T.ok(H.profile(world, ann).coins > 50, "the game goes on")
+	H.clean("store down during play")
+	-- it comes back: the next autosave stores everything
+	Mock.datastore.fail = nil
+	Mock.step(125)
+	T.eq(Mock.stores.PetTower_PlayerData_v1.u_101.data.coins, H.profile(world, ann).coins)
+	H.clean("store back")
+	-- a load that fails twice and then works: the player gets in after the retries
+	local fails = 2
+	Mock.datastore.fail = function(name, key) if key == "u_102" and fails > 0 then fails = fails - 1 return "throttled" end end
+	local bob, cb = H.join(world, 102, "Bob", 6)
+	T.ok(H.profile(world, bob), "loaded on the third attempt")
+	T.eq(#world.kicks, 0)
+	Mock.datastore.fail = nil
+	H.clean("load retries")
+	-- shutdown while the store is down: the server still closes inside the 30 s window
+	Mock.datastore.fail = function() return "502" end
+	world:shutdown()
+	T.ok(world.closeSeconds <= 25, "closed in " .. world.closeSeconds .. " s")
+	T.eq(world.closeStuck, 0)
+	T.eq(H.expectWarning("save failed"), 2, "both failed saves are reported")
+	H.clean("shutdown with the store down")
+end
+
 return tests
