@@ -1,6 +1,9 @@
 -- Runs every test file. python3 tools/lua.py tests/run.lua
-local files = { "test_formulas", "test_profile", "test_tap", "test_spawn", "test_showdown", "test_data", "test_sim" }
-for _, extra in ipairs(EXTRA_TESTS or {}) do files[#files + 1] = extra end
+local files = {}
+for _, path in ipairs(LISTDIR(ROOT .. "/tests")) do
+	local name = path:match("(test_[%w_]+)%.lua$")
+	if name then files[#files + 1] = name end
+end
 local pass, fail = 0, 0
 T = {}
 function T.eq(a, b, msg)
