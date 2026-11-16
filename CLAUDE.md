@@ -7,6 +7,7 @@ A new, original Roblox game for players aged 7-12 on phones. Owner account: Fant
 - Where things stand: `docs/STATUS.md`. What differs from the bible and what awaits the owner's
   ruling: `docs/DECISIONS.md`.
 - On the Mac, start with `docs/HANDOFF_MAC.md`.
+- Taking over from another session or account: `docs/CONTINUE_PROMPT.md`.
 - Branches: `main` = last build that passed Studio tests; `dev` = current work.
 
 Skills in `.claude/skills/` (use them):
